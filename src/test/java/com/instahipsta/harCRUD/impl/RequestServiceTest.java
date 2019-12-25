@@ -38,8 +38,6 @@ public class RequestServiceTest {
     private HttpMethod httpMethod;
     private TestProfile testProfile;
 
-    //Значения в map перезаписываются!!!
-
     @Before
     public void initFields() {
         url = "https://yandex.ru";

@@ -36,7 +36,7 @@ public class HarServiceTest {
 
     @Test
     public void saveTest() throws Exception {
-        Har har = new Har("1", "Firefox", "1", "/azaza");
+        Har har = harService.create("1", "Firefox", "1", "/azaza");
         Har resultHar = harService.save(har);
         Assert.assertEquals(resultHar.getFileName(), har.getFileName());
         Har findHar = harService.findById(resultHar.getId());
@@ -54,4 +54,15 @@ public class HarServiceTest {
         Har har = harService.createHarFromFile("test_archive.har");
         Assert.assertEquals("70.0.1", har.getBrowserVersion());
     }
+
+    @Test
+    public void createTest() throws Exception {
+        Har har = harService.create("1", "Firefox", "1", "/lolol");
+        Assert.assertNotNull(har);
+        Assert.assertEquals("1", har.getVersion());
+        Assert.assertEquals("Firefox", har.getBrowser());
+        Assert.assertEquals("1", har.getBrowserVersion());
+        Assert.assertEquals("/lolol", har.getFileName());
+    }
+
 }
