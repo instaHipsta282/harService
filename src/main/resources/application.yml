@@ -5,12 +5,37 @@ spring:
 ---
 
 spring:
+  profiles: prod
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://db:5432/har_service
+    password: root
+    username: root
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  rabbitmq:
+    host: rabbitmq
+    username: root
+    password: root
+file:
+  downloads: ./downloads
+
+---
+
+spring:
   profiles: dev
   jpa:
     database: POSTGRESQL
     hibernate:
       ddl-auto: update
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/har_service
     password: root
     username: root
@@ -34,6 +59,7 @@ spring:
     hibernate:
       ddl-auto: create
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/har_service_test
     password: root
     username: root

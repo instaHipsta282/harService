@@ -23,6 +23,7 @@ public class Request {
     @MapKeyColumn(name = "headers_key", length = 25000)
     @Column(name = "headers_val", length = 25000)
     private Map<String, String> headers;
+
     @ElementCollection
     @MapKeyColumn(name = "params_key", length = 25000)
     @Column(name = "params_val", length = 25000)
@@ -43,7 +44,7 @@ public class Request {
         this.testProfile = testProfile;
     }
 
-    public Request() { }
+    public Request() {}
 
     public String getUrl() { return url; }
 

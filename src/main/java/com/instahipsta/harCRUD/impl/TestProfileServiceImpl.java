@@ -15,22 +15,30 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import static java.util.Arrays.asList;
 
 @Service
 public class TestProfileServiceImpl implements TestProfileService {
 
     private TestProfileRepo testProfileRepo;
     private RequestService requestService;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    public TestProfileServiceImpl(TestProfileRepo testProfileRepo, RequestService requestService) {
+    public TestProfileServiceImpl(TestProfileRepo testProfileRepo, RequestService requestService,
+                                  ObjectMapper objectMapper) {
         this.testProfileRepo = testProfileRepo;
         this.requestService = requestService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public TestProfile save(TestProfile testProfile) {
-        int requestsCount = testProfile.getRequests() == null ? 0 : testProfile.getRequests().size();
+        int requestsCount =
+                testProfile.getRequests() == null ? 0 : testProfile.getRequests().size();
+
         testProfile.setRequestsCount(requestsCount);
         return testProfileRepo.save(testProfile);
     }
@@ -47,31 +55,32 @@ public class TestProfileServiceImpl implements TestProfileService {
 
     @Override
     public TestProfile harToTestProfile(byte[] har) {
-
         TestProfile testProfile = create(new ArrayList<>());
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode archive = null;
-
-        try { archive = objectMapper.readTree(har); }
+        JsonNode entries = null;
+        try {
+            entries = objectMapper.readTree(har).path("log").path("entries");
+        }
         catch (IOException e) { e.printStackTrace(); }
 
-        JsonNode entries = archive.path("log").path("entries");
-
-        if (entries.isArray()) {
-            for (JsonNode entry : entries) {
-                JsonNode request = entry.path("request");
-
-                String url = request.path("url").asText();
-                String body = request.path("postData").asText();
-                HttpMethod method = HttpMethod.valueOf(request.path("method").asText());
-                Map<String, String> headers = requestService.getMapValues(request.path("headers"));
-                Map<String, String> params = requestService.getMapValues(request.path("queryString"));
-
-                Request req = requestService.create(url, body, headers, params, method, testProfile);
-
-                testProfile.getRequests().add(req);
-            }
+        for (JsonNode entry : Objects.requireNonNull(entries)) {
+            Request req = entryToRequest(entry, testProfile);
+            testProfile.getRequests().add(req);
         }
+
         return save(testProfile);
     }
+
+    @Override
+    public Request entryToRequest(JsonNode entry, TestProfile testProfile) {
+        JsonNode request = entry.path("request");
+
+        String url = request.path("url").asText();
+        String body = request.path("postData").asText();
+        HttpMethod method = HttpMethod.valueOf(request.path("method").asText());
+        Map<String, String> headers = requestService.getMapValues(request.path("headers"));
+        Map<String, String> params = requestService.getMapValues(request.path("queryString"));
+
+        return requestService.create(url, body, headers, params, method, testProfile);
+    }
+
 }

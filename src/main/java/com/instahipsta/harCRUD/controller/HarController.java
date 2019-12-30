@@ -50,7 +50,6 @@ public class HarController {
         }
 
         if (resultFileName != null && savedHar != null) {
-            testProfileService.harToTestProfile(data);
             rabbitTemplate.convertAndSend("har", data);
         }
 

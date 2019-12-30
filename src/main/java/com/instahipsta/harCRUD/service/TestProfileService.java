@@ -1,10 +1,14 @@
 package com.instahipsta.harCRUD.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.instahipsta.harCRUD.domain.Request;
 import com.instahipsta.harCRUD.domain.TestProfile;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
+@Service
 public interface TestProfileService {
 
     TestProfile save(TestProfile testProfile);
@@ -13,5 +17,7 @@ public interface TestProfileService {
 
     TestProfile create(List<Request> requests);
 
-    TestProfile harToTestProfile(byte[] har);
+    TestProfile harToTestProfile(byte[] har) throws IOException;
+
+    Request entryToRequest(JsonNode entry, TestProfile testProfile);
 }

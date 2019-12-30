@@ -43,7 +43,6 @@ public class FileServiceTest {
     @Test
     public void saveFileTest() throws Exception {
         String fileName = fileService.saveFile(multipartFile);
-        System.out.println(fileName);
         Assert.assertNotNull(fileName);
     }
 }
