@@ -62,7 +62,7 @@ public class TestProfileServiceImpl implements TestProfileService {
         }
         catch (IOException e) { e.printStackTrace(); }
 
-        for (JsonNode entry : Objects.requireNonNull(entries)) {
+        for (JsonNode entry : entries) {
             Request req = entryToRequest(entry, testProfile);
             testProfile.getRequests().add(req);
         }

@@ -17,7 +17,7 @@ public interface TestProfileService {
 
     TestProfile create(List<Request> requests);
 
-    TestProfile harToTestProfile(byte[] har) throws IOException;
+    TestProfile harToTestProfile(byte[] har);
 
     Request entryToRequest(JsonNode entry, TestProfile testProfile);
 }

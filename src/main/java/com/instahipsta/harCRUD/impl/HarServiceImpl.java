@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 @Service
 public class HarServiceImpl implements HarService {
@@ -19,7 +20,7 @@ public class HarServiceImpl implements HarService {
     private HarRepo harRepo;
 
     @Value("${file.downloads}")
-    private String downloadPath;
+    private String downloadsPath;
 
     @Autowired
     public HarServiceImpl(HarRepo harRepo, ObjectMapper objectMapper) {
@@ -29,7 +30,11 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public Har save(Har har) {
-        return harRepo.save(har);
+        Har savedHar =  harRepo.save(har);
+        if (savedHar.getVersion().isEmpty()) {
+            return null;
+        }
+        else return har;
     }
 
     @Override
@@ -43,10 +48,9 @@ public class HarServiceImpl implements HarService {
     }
 
     @Override
-    public Har createHarFromFile(String resultFileName) {
-        File file = new File(downloadPath + "/" + resultFileName);
+    public Har createHarFromFile(Path filePath) {
         try {
-            JsonNode log = objectMapper.readTree(file).path("log");
+            JsonNode log = objectMapper. readTree(filePath.toFile()).path("log");
 
             String version = log.path("version")
                     .toString().replaceAll("\"", "");
@@ -54,10 +58,11 @@ public class HarServiceImpl implements HarService {
                     .path("name").toString().replaceAll("\"", "");
             String browserVersion = log.path("browser")
                     .path("version").toString().replaceAll("\"", "");
-
-            return create(version, browser, browserVersion, resultFileName);
+            return create(version, browser, browserVersion, filePath.getFileName().toString());
         }
-        catch (IOException e) { e.printStackTrace(); }
-        return null;
+        catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

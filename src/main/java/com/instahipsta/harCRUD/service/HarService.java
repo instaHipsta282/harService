@@ -1,7 +1,8 @@
 package com.instahipsta.harCRUD.service;
 
 import com.instahipsta.harCRUD.domain.Har;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Path;
 
 public interface HarService {
     Har save(Har har);
@@ -10,5 +11,5 @@ public interface HarService {
 
     Har create(String version, String browser, String browserVersion, String resultFileName);
 
-    Har createHarFromFile(String resultFileName);
+    Har createHarFromFile(Path filePath);
 }

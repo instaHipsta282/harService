@@ -13,6 +13,7 @@ public class Har {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "har_id_seq")
     @SequenceGenerator(name = "har_id_seq", sequenceName = "har_id_seq", allocationSize = 1)
     private Long id;
+    @Column(nullable = false)
     private String version;
     private String browser;
     private String browserVersion;
@@ -47,31 +48,20 @@ public class Har {
 
     public void setFileName(String fileName) { this.fileName = fileName; }
 
-    @Override
-    public String toString() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = null;
-
-        try { json = objectMapper.writeValueAsString(this); }
-        catch (JsonProcessingException e) { e.printStackTrace(); }
-
-        return json;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Har har = (Har) o;
-        return Objects.equals(id, har.id) &&
-                Objects.equals(version, har.version) &&
-                Objects.equals(browser, har.browser) &&
-                Objects.equals(browserVersion, har.browserVersion) &&
-                Objects.equals(fileName, har.fileName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, version, browser, browserVersion, fileName);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Har har = (Har) o;
+//        return Objects.equals(id, har.id) &&
+//                Objects.equals(version, har.version) &&
+//                Objects.equals(browser, har.browser) &&
+//                Objects.equals(browserVersion, har.browserVersion) &&
+//                Objects.equals(fileName, har.fileName);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, version, browser, browserVersion, fileName);
+//    }
 }

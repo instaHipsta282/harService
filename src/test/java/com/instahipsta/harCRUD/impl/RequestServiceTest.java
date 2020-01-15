@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
@@ -37,6 +38,8 @@ public class RequestServiceTest {
     private Map<String, String> params = new HashMap<>();
     private HttpMethod httpMethod;
     private TestProfile testProfile;
+    @Value("${file.filesForTests}")
+    private String filesForTests;
 
     @Before
     public void initFields() {
@@ -56,7 +59,7 @@ public class RequestServiceTest {
 
     @Test
     public void getMapValuesTest() throws Exception {
-        File file = new File("test_downloads/test.json");
+        File file = new File(filesForTests + "/test.json");
         JsonNode node = objectMapper.readTree(file).path("headers");
         Map<String, String> map = requestService.getMapValues(node);
 
@@ -64,6 +67,14 @@ public class RequestServiceTest {
         Assert.assertEquals("Sun, 01 Dec 2019 21:32:09 GMT", map.get("Last-Modified"));
         Assert.assertEquals("video/webm", map.get("Content-Type"));
         Assert.assertEquals("Mon, 02 Dec 2019 13:59:15 GMT", map.get("Date"));
+    }
+
+    @Test
+    public void getMapValuesNegativeTest() throws Exception {
+        File file = new File(filesForTests + "/test3.json");
+        JsonNode node = objectMapper.readTree(file).path("headers");
+        Map<String, String> map = requestService.getMapValues(node);
+        Assert.assertTrue(map.isEmpty());
     }
 
     @Test

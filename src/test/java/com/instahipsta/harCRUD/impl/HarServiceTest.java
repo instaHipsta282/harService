@@ -3,22 +3,23 @@ package com.instahipsta.harCRUD.impl;
 import com.instahipsta.harCRUD.domain.Har;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.jca.context.SpringContextResourceAdapter;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -27,11 +28,15 @@ public class HarServiceTest {
 
     @Autowired
     private HarServiceImpl harService;
+    private long harId;
+    @Value("${file.filesForTests}")
+    private String filesToTests;
 
     @Before
     public void createHar() {
         Har har = new Har("2", "Chrome", "2", "/olollo");
-        harService.save(har);
+        Har savedHar = harService.save(har);
+        harId = savedHar.getId();
     }
 
     @Test
@@ -39,20 +44,29 @@ public class HarServiceTest {
         Har har = harService.create("1", "Firefox", "1", "/azaza");
         Har resultHar = harService.save(har);
         Assert.assertEquals(resultHar.getFileName(), har.getFileName());
-        Har findHar = harService.findById(resultHar.getId());
-        Assert.assertEquals(resultHar, harService.findById(resultHar.getId()));
+        Assert.assertEquals(resultHar.getBrowser(), har.getBrowser());
+        Assert.assertEquals(resultHar.getBrowserVersion(), har.getBrowserVersion());
+        Assert.assertEquals(resultHar.getVersion(), har.getVersion());
     }
 
     @Test
     public void findByIdTest() throws Exception {
-        Har har = harService.findById(1L);
+        Har har = harService.findById(harId);
         Assert.assertNotNull(har);
     }
 
     @Test
     public void createHarFromFileTest() throws Exception {
-        Har har = harService.createHarFromFile("test_archive.har");
+        File file = new File(filesToTests + "/test_archive.har");
+        Har har = harService.createHarFromFile(file.toPath());
         Assert.assertEquals("70.0.1", har.getBrowserVersion());
+    }
+
+    @Test
+    public void createHarFromFileNegativeTest() throws Exception {
+        File file = new File(filesToTests + "/test_archive_doesnt_exist.har");
+        Har har = harService.createHarFromFile(file.toPath());
+        Assert.assertNull(har);
     }
 
     @Test
@@ -64,5 +78,6 @@ public class HarServiceTest {
         Assert.assertEquals("1", har.getBrowserVersion());
         Assert.assertEquals("/lolol", har.getFileName());
     }
+
 
 }

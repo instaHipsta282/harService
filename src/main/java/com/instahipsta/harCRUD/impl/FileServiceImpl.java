@@ -25,10 +25,11 @@ public class FileServiceImpl implements FileService {
             String uuidFile = UUID.randomUUID().toString();
             String resultFilename = uuidFile + "." + file.getOriginalFilename();
 
-            try { file.transferTo(new File(downloadDir.getAbsolutePath() + "/" + resultFilename)); }
+            try {
+                file.transferTo(new File(downloadDir.getAbsolutePath() + "/" + resultFilename));
+                return resultFilename;
+            }
             catch (IOException e) { e.printStackTrace(); }
-
-            return resultFilename;
         }
         return null;
     }

@@ -73,3 +73,4 @@ spring:
     password: root
 file:
   downloads: test_downloads
+  filesForTests: filesForTests
