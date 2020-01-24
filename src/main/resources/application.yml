@@ -23,6 +23,9 @@ spring:
     host: rabbitmq
     username: root
     password: root
+  liquibase:
+    enabled: true
+    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
 file:
   downloads: ./downloads
 
@@ -33,7 +36,8 @@ spring:
   jpa:
     database: POSTGRESQL
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
+    show-sql: true
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/har_service
@@ -47,6 +51,10 @@ spring:
     host: 127.0.0.1
     username: root
     password: root
+  liquibase:
+    enabled: true
+    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
+
 file:
   downloads: ./downloads
 
@@ -71,6 +79,9 @@ spring:
     host: 127.0.0.1
     username: root
     password: root
+  liquibase:
+    enabled: true
+    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
 file:
   downloads: test_downloads
   filesForTests: filesForTests

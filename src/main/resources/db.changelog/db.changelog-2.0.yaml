@@ -1,0 +1,165 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: instahipsta282
+      changes:
+        - createTable:
+            tableName: test_profile
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: requests_count
+                  type: integer
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 3
+      author: instahipsta282
+      changes:
+        - createTable:
+            tableName: request
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: body
+                  type: text
+              - column:
+                  name: method
+                  type: integer
+              - column:
+                  name: perc
+                  type: double precision
+              - column:
+                  name: url
+                  type: varchar(65000)
+              - column:
+                  name: test_profile_id
+                  type: BIGINT
+
+
+  - changeSet:
+      id: 4
+      author: instahipsta282
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: test_profile_id
+            baseTableName: request
+            constraintName: fk_request_test_profile
+            referencedColumnNames: id
+            referencedTableName: test_profile
+
+  - changeSet:
+      id: 5
+      author: instahipsta282
+      changes:
+        - createTable:
+            tableName: test_profile_requests
+            columns:
+              - column:
+                  name: test_profile_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requests_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 6
+      author: instahipsta282
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: test_profile_id
+            baseTableName: test_profile_requests
+            constraintName: fk_test_profile_requests
+            referencedColumnNames: id
+            referencedTableName: test_profile
+
+  - changeSet:
+      id: 7
+      author: instahipsta282
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: requests_id
+            baseTableName: test_profile_requests
+            constraintName: fk_requests_test_profile
+            referencedColumnNames: id
+            referencedTableName: request
+
+  - changeSet:
+      id: 8
+      author: instahipsta282
+      changes:
+        - createTable:
+            tableName: request_headers
+            columns:
+              - column:
+                  name: request_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: headers_val
+                  type: varchar(25000)
+              - column:
+                  name: headers_key
+                  type: varchar(25000)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 9
+      author: instahipsta282
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: request_id
+            baseTableName: request_headers
+            constraintName: fk_request_headers
+            referencedColumnNames: id
+            referencedTableName: request
+
+  - changeSet:
+      id: 10
+      author: instahipsta282
+      changes:
+        - createTable:
+            tableName: request_params
+            columns:
+              - column:
+                  name: request_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: params_val
+                  type: varchar(25000)
+              - column:
+                  name: params_key
+                  type: varchar(25000)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 11
+      author: instahipsta282
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: request_id
+            baseTableName: request_params
+            constraintName: fk_request_params
+            referencedColumnNames: id
+            referencedTableName: request

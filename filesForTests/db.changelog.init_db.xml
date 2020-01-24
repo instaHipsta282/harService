@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1" author="instahipsta282">
+        <createTable tableName="har">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="har_pkey" nullable="false"/>
+            </column>
+            <column name="browser" type="varchar(255)"/>
+            <column name="browser_version" type="varchar(255)"/>
+            <column name="file_name" type="varchar(255)"/>
+            <column name="version" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addAutoIncrement columnDataType="bigint"
+                          columnName="id"
+                          defaultOnNull="false"
+                          generationType="ALWAYS"
+                          incrementBy="1"
+                          schemaName="public"
+                          startWith="1"
+                          tableName="har"/>
+    </changeSet>
+
+<!--    <changeSet id="2" author="instahipsta282">-->
+<!--        <createTable tableName="request">-->
+<!--            <column name="id" type="bigint">-->
+<!--                <constraints primaryKey="true" primaryKeyName="request_pkey" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="body" type="text"/>-->
+<!--            <column name="method" type="integer"/>-->
+<!--            <column name="perc" type="double precision"/>-->
+<!--            <column name="url" type="varchar(65000)"/>-->
+<!--            <column name="test_profile_id" type="bigint">-->
+<!--                <constraints foreignKeyName="request_test_profile" references="test_profile(id)"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+
+<!--        <addAutoIncrement columnDataType="bigint"-->
+<!--                          columnName="id"-->
+<!--                          defaultOnNull="false"-->
+<!--                          generationType="ALWAYS"-->
+<!--                          incrementBy="1"-->
+<!--                          schemaName="public"-->
+<!--                          startWith="1"-->
+<!--                          tableName="request"/>-->
+<!--    </changeSet>-->
+
+    <changeSet id="3" author="instahipsta282">
+        <createTable tableName="request_headers">
+            <column name="request_id" type="bigint">
+                <constraints foreignKeyName="request_header_fk" references="request(id)" nullable="false"/>
+            </column>
+            <column name="headers_val" type="varchar(25000)"/>
+            <column name="headers_key" type="varchar(25000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="request_id, headers_key"
+                       constraintName="request_headers_pk"
+                       schemaName="public"
+                       tableName="request_headers"/>
+    </changeSet>
+
+    <changeSet id="4.1" author="instahipsta282">
+        <createTable tableName="request_params">
+            <column name="request_id" type="bigint">
+                <constraints references="request(id)" foreignKeyName="request_param_fk" nullable="false"/>
+            </column>
+            <column name="params_val" type="varchar(25000)"/>
+            <column name="params_key" type="varchar(25000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="request_id, params_key"
+                       constraintName="request_params_pk"
+                       schemaName="public"
+                       tableName="request_params"/>
+    </changeSet>
+
+<!--    <changeSet id="5" author="instahipsta282">-->
+<!--        <createTable tableName="test_profile">-->
+<!--            <column name="id" type="bigint">-->
+<!--                <constraints primaryKey="true" primaryKeyName="test_profile_pkey" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="requests_count" type="integer">-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet id="6" author="instahipsta282">-->
+<!--        <createTable tableName="test_profile_requests">-->
+<!--            <column name="test_profile_id" type="bigint">-->
+<!--                <constraints references="test_profile" nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="requests_id" type="bigint">-->
+<!--                <constraints references="request" nullable="false"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+
+</databaseChangeLog>
