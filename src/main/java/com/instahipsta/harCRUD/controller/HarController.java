@@ -46,7 +46,6 @@ public class HarController {
         byte[] data = file.getBytes();
         Har savedHar = null;
         String resultFileName = fileService.saveFile(file);
-        System.out.println(resultFileName);
         if (resultFileName != null) {
             File savedFile = new File(downloadPath + "/" + resultFileName);
             Har har = harService.createHarFromFile(savedFile.toPath());
