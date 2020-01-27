@@ -7,6 +7,8 @@ import com.instahipsta.harCRUD.domain.TestProfile;
 import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -15,13 +17,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import static java.util.Arrays.asList;
 
 @Service
 public class TestProfileServiceImpl implements TestProfileService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TestProfileServiceImpl.class);
     private TestProfileRepo testProfileRepo;
     private RequestService requestService;
     private ObjectMapper objectMapper;
@@ -60,7 +60,9 @@ public class TestProfileServiceImpl implements TestProfileService {
         try {
             entries = objectMapper.readTree(har).path("log").path("entries");
         }
-        catch (IOException e) { e.printStackTrace(); }
+        catch (IOException e) {
+            logger.error("Failed to JSON parse", e);
+        }
 
         for (JsonNode entry : entries) {
             Request req = entryToRequest(entry, testProfile);

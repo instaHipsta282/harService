@@ -2,9 +2,13 @@ package com.instahipsta.harCRUD.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.config.RabbitConfiguration;
 import com.instahipsta.harCRUD.domain.Har;
+import com.instahipsta.harCRUD.dto.HarDTO;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,7 @@ import java.nio.file.Path;
 @Service
 public class HarServiceImpl implements HarService {
 
+    private static final Logger logger = LoggerFactory.getLogger(HarServiceImpl.class);
     private ObjectMapper objectMapper;
     private HarRepo harRepo;
 
@@ -50,7 +55,7 @@ public class HarServiceImpl implements HarService {
     @Override
     public Har createHarFromFile(Path filePath) {
         try {
-            JsonNode log = objectMapper. readTree(filePath.toFile()).path("log");
+            JsonNode log = objectMapper.readTree(filePath.toFile()).path("log");
 
             String version = log.path("version")
                     .toString().replaceAll("\"", "");
@@ -61,7 +66,7 @@ public class HarServiceImpl implements HarService {
             return create(version, browser, browserVersion, filePath.getFileName().toString());
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to read JSON parse", e);
             return null;
         }
     }
