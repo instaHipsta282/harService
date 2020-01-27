@@ -5,6 +5,8 @@ import com.instahipsta.harCRUD.domain.Request;
 import com.instahipsta.harCRUD.domain.TestProfile;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.RequestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
