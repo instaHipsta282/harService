@@ -25,7 +25,7 @@ services:
       - ./conf/:/etc/rabbitmq/
   backend:
     container_name: har_backend
-    image: instahipsta/har_service:0.8
+    image: instahipsta/har_service:0.9
     restart: always
     ports:
     - 8080:8080
