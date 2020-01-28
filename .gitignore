@@ -1,9 +1,9 @@
 .idea/
-HarCRUD.iml
-*.iml
-/build
 target/
 downloads/
-/out
 test_downloads/
+rabbit/
 log/
+/out
+*.iml
+*.log

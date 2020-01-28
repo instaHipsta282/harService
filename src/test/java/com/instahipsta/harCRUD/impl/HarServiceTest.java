@@ -1,25 +1,18 @@
 package com.instahipsta.harCRUD.impl;
 
-import com.instahipsta.harCRUD.domain.Har;
+import com.instahipsta.harCRUD.entity.Har;
+import com.instahipsta.harCRUD.dto.HarDTO;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jca.context.SpringContextResourceAdapter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -35,14 +28,14 @@ public class HarServiceTest {
     @Before
     public void createHar() {
         Har har = new Har("2", "Chrome", "2", "/olollo");
-        Har savedHar = harService.save(har);
+        HarDTO savedHar = harService.save(har);
         harId = savedHar.getId();
     }
 
     @Test
     public void saveTest() throws Exception {
         Har har = harService.create("1", "Firefox", "1", "/azaza");
-        Har resultHar = harService.save(har);
+        HarDTO resultHar = harService.save(har);
         Assert.assertEquals(resultHar.getFileName(), har.getFileName());
         Assert.assertEquals(resultHar.getBrowser(), har.getBrowser());
         Assert.assertEquals(resultHar.getBrowserVersion(), har.getBrowserVersion());

@@ -1,34 +1,50 @@
-package com.instahipsta.harCRUD.dto;
+package com.instahipsta.harCRUD.entity;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpMethod;
 
+import javax.persistence.*;
 import java.util.Map;
 
-public class RequestDTO implements Transferable {
+@Entity
+public class Request implements Entityable {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "request_id_seq")
+    @SequenceGenerator(name = "request_id_seq", sequenceName = "request_id_seq", allocationSize = 1)
     private Long id;
+
+    @Length(max = 65000)
     private String url;
+    @Lob
     private String body;
+
+    @ElementCollection
+    @MapKeyColumn(name = "headers_key", length = 25000)
+    @Column(name = "headers_val", length = 25000)
     private Map<String, String> headers;
+
+    @ElementCollection
+    @MapKeyColumn(name = "params_key", length = 25000)
+    @Column(name = "params_val", length = 25000)
     private Map<String, String> params;
     private HttpMethod method;
-    private Double perc;
-    private long testProfileId;
+    private Double perc = 0.0;
 
-    public RequestDTO(Long id, String url, String body,
-                      Map<String, String> headers, Map<String, String> params,
-                      HttpMethod method, Double perc, long testProfileId) {
-        this.id = id;
+    @ManyToOne
+    private TestProfile testProfile;
+
+    public Request(String url, String body, Map<String, String> headers, Map<String, String> params,
+                   HttpMethod method, TestProfile testProfile) {
         this.url = url;
         this.body = body;
         this.headers = headers;
         this.params = params;
         this.method = method;
-        this.perc = perc;
-        this.testProfileId = testProfileId;
+        this.testProfile = testProfile;
     }
 
-    public RequestDTO() {}
+    public Request() {}
 
     public Long getId() { return id; }
 
@@ -58,8 +74,7 @@ public class RequestDTO implements Transferable {
 
     public void setPerc(Double perc) { this.perc = perc; }
 
-    public long getTestProfileId() { return testProfileId; }
+    public TestProfile getTestProfile() { return testProfile; }
 
-    public void setTestProfileId(long testProfileId) { this.testProfileId = testProfileId; }
-
+    public void setTestProfile(TestProfile testProfile) { this.testProfile = testProfile; }
 }

@@ -1,10 +1,10 @@
 package com.instahipsta.harCRUD.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.domain.Har;
+import com.instahipsta.harCRUD.entity.Har;
+import com.instahipsta.harCRUD.dto.HarDTO;
 import com.instahipsta.harCRUD.service.FileService;
 import com.instahipsta.harCRUD.service.HarService;
-import com.rabbitmq.tools.json.JSONUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,7 @@ public class HarController {
     @PostMapping("upload")
     public String uploadHar(@RequestParam MultipartFile file) throws IOException {
         byte[] data = file.getBytes();
-        Har savedHar = null;
+        HarDTO savedHar = null;
         String resultFileName = fileService.saveFile(file);
         if (resultFileName != null) {
             File savedFile = new File(downloadPath + "/" + resultFileName);

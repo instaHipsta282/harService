@@ -1,11 +1,12 @@
 package com.instahipsta.harCRUD.service;
 
-import com.instahipsta.harCRUD.domain.Har;
+import com.instahipsta.harCRUD.entity.Har;
+import com.instahipsta.harCRUD.dto.HarDTO;
 
 import java.nio.file.Path;
 
 public interface HarService {
-    Har save(Har har);
+    HarDTO save(Har har);
 
     Har findById(Long id);
 

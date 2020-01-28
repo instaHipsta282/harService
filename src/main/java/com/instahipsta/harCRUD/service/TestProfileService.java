@@ -1,11 +1,10 @@
 package com.instahipsta.harCRUD.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.instahipsta.harCRUD.domain.Request;
-import com.instahipsta.harCRUD.domain.TestProfile;
+import com.instahipsta.harCRUD.entity.Request;
+import com.instahipsta.harCRUD.entity.TestProfile;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service

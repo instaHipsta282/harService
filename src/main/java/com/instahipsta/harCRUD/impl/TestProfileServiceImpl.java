@@ -2,8 +2,8 @@ package com.instahipsta.harCRUD.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.domain.Request;
-import com.instahipsta.harCRUD.domain.TestProfile;
+import com.instahipsta.harCRUD.entity.Request;
+import com.instahipsta.harCRUD.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;

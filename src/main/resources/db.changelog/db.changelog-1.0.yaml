@@ -20,7 +20,10 @@ databaseChangeLog:
                   name: browser_version
                   type: varchar(255)
               - column:
-                  name: file_name
+                  name: version
                   type: varchar(255)
                   constraints:
                     nullable: false
+              - column:
+                  name: file_name
+                  type: varchar(255)

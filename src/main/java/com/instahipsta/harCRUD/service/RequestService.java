@@ -1,8 +1,8 @@
 package com.instahipsta.harCRUD.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.instahipsta.harCRUD.domain.Request;
-import com.instahipsta.harCRUD.domain.TestProfile;
+import com.instahipsta.harCRUD.entity.Request;
+import com.instahipsta.harCRUD.entity.TestProfile;
 import org.springframework.http.HttpMethod;
 
 import java.util.Map;

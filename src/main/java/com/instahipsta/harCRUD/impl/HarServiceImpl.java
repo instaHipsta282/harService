@@ -2,9 +2,9 @@ package com.instahipsta.harCRUD.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.config.RabbitConfiguration;
-import com.instahipsta.harCRUD.domain.Har;
+import com.instahipsta.harCRUD.entity.Har;
 import com.instahipsta.harCRUD.dto.HarDTO;
+import com.instahipsta.harCRUD.mapper.HarMapper;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
 import org.slf4j.Logger;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -22,24 +21,35 @@ public class HarServiceImpl implements HarService {
 
     private static final Logger logger = LoggerFactory.getLogger(HarServiceImpl.class);
     private ObjectMapper objectMapper;
+    private HarMapper mapper;
     private HarRepo harRepo;
 
     @Value("${file.downloads}")
     private String downloadsPath;
 
     @Autowired
-    public HarServiceImpl(HarRepo harRepo, ObjectMapper objectMapper) {
+    public HarServiceImpl(HarRepo harRepo, ObjectMapper objectMapper, HarMapper mapper) {
         this.objectMapper = objectMapper;
         this.harRepo = harRepo;
+        this.mapper = mapper;
     }
+//
+//    @Override
+//    public Har save(Har har) {
+//        Har savedHar =  harRepo.save(har);
+//        if (savedHar.getVersion().isEmpty()) {
+//            return null;
+//        }
+//        else return har;
+//    }
 
     @Override
-    public Har save(Har har) {
+    public HarDTO save(Har har) {
         Har savedHar =  harRepo.save(har);
         if (savedHar.getVersion().isEmpty()) {
             return null;
         }
-        else return har;
+        else return mapper.toDto(savedHar);
     }
 
     @Override
