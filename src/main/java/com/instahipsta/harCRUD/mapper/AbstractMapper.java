@@ -48,9 +48,7 @@ public abstract class AbstractMapper<E extends Entityable, D extends Transferabl
         };
     }
 
-    void mapSpecificFields(D source, E destination) {
-    }
+    void mapSpecificFields(D source, E destination) { }
 
-    void mapSpecificFields(E source, D destination) {
-    }
+    void mapSpecificFields(E source, D destination) { }
 }

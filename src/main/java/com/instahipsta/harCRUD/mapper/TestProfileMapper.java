@@ -1,7 +1,7 @@
 package com.instahipsta.harCRUD.mapper;
 
-import com.instahipsta.harCRUD.entity.TestProfile;
 import com.instahipsta.harCRUD.dto.TestProfileDTO;
+import com.instahipsta.harCRUD.entity.TestProfile;
 import org.springframework.stereotype.Component;
 
 @Component

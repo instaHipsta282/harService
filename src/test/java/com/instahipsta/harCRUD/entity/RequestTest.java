@@ -64,6 +64,20 @@ public class RequestTest {
     }
 
     @Test
+    public void getIdTest() throws Exception {
+        request.setId(1L);
+        Long id = request.getId();
+        Assert.assertNotNull(id);
+    }
+
+    @Test
+    public void setIdTest() throws Exception {
+        request.setId(376L);
+        long newId = request.getId();
+        Assert.assertEquals(376, newId);
+    }
+
+    @Test
     public void getUrlTest() throws Exception {
         Assert.assertEquals("https://yandex.ru", request.getUrl());
     }

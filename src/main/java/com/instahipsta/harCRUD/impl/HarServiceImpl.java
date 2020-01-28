@@ -2,8 +2,8 @@ package com.instahipsta.harCRUD.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.entity.Har;
 import com.instahipsta.harCRUD.dto.HarDTO;
+import com.instahipsta.harCRUD.entity.Har;
 import com.instahipsta.harCRUD.mapper.HarMapper;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
@@ -33,15 +33,6 @@ public class HarServiceImpl implements HarService {
         this.harRepo = harRepo;
         this.mapper = mapper;
     }
-//
-//    @Override
-//    public Har save(Har har) {
-//        Har savedHar =  harRepo.save(har);
-//        if (savedHar.getVersion().isEmpty()) {
-//            return null;
-//        }
-//        else return har;
-//    }
 
     @Override
     public HarDTO save(Har har) {
