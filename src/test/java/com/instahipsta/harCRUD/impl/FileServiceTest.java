@@ -1,5 +1,6 @@
 package com.instahipsta.harCRUD.impl;
 
+import com.instahipsta.harCRUD.service.impl.FileServiceImpl;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
