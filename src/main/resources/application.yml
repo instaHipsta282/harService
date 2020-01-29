@@ -26,6 +26,16 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
+
+management:
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
+
 file:
   downloads: ./downloads
 
@@ -54,6 +64,15 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
+
+management:
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
 
 file:
   downloads: ./downloads
