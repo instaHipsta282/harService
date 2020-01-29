@@ -4,8 +4,9 @@ services:
     container_name: har_db
     image: postgres
     restart: always
-    env_file:
-      - postgresql.env
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root
     ports:
       - 5432:5432
     volumes:
@@ -15,8 +16,9 @@ services:
     container_name: har_rabbitmq
     image: rabbitmq:3-management
     restart: always
-    env_file:
-      - rabbitmq.env
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=root
     ports:
       - 15672:15672
       - 5672:5672
