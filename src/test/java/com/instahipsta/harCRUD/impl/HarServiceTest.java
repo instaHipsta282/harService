@@ -1,7 +1,8 @@
 package com.instahipsta.harCRUD.impl;
 
-import com.instahipsta.harCRUD.entity.Har;
-import com.instahipsta.harCRUD.dto.HarDTO;
+import com.instahipsta.harCRUD.model.entity.Har;
+import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.service.impl.HarServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

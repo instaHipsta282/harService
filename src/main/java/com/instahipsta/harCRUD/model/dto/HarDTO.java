@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.dto;
+package com.instahipsta.harCRUD.model.dto;
 
 public class HarDTO implements Transferable {
 

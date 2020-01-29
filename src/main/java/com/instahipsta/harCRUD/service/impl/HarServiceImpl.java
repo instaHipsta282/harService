@@ -1,9 +1,9 @@
-package com.instahipsta.harCRUD.impl;
+package com.instahipsta.harCRUD.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.dto.HarDTO;
-import com.instahipsta.harCRUD.entity.Har;
+import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.mapper.HarMapper;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;

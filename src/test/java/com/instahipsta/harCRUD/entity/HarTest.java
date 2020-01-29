@@ -1,5 +1,6 @@
 package com.instahipsta.harCRUD.entity;
 
+import com.instahipsta.harCRUD.model.entity.Har;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

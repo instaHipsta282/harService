@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.dto;
+package com.instahipsta.harCRUD.model.dto;
 
 import org.springframework.http.HttpMethod;
 

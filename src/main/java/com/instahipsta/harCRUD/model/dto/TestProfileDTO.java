@@ -1,6 +1,6 @@
-package com.instahipsta.harCRUD.dto;
+package com.instahipsta.harCRUD.model.dto;
 
-import com.instahipsta.harCRUD.entity.Request;
+import com.instahipsta.harCRUD.model.entity.Request;
 
 import java.util.List;
 

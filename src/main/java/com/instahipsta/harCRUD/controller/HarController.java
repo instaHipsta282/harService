@@ -1,8 +1,8 @@
 package com.instahipsta.harCRUD.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.dto.HarDTO;
-import com.instahipsta.harCRUD.entity.Har;
+import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.service.FileService;
 import com.instahipsta.harCRUD.service.HarService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

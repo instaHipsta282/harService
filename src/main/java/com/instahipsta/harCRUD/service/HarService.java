@@ -1,7 +1,7 @@
 package com.instahipsta.harCRUD.service;
 
-import com.instahipsta.harCRUD.dto.HarDTO;
-import com.instahipsta.harCRUD.entity.Har;
+import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.model.entity.Har;
 
 import java.nio.file.Path;
 

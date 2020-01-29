@@ -1,7 +1,7 @@
 package com.instahipsta.harCRUD.mapper;
 
-import com.instahipsta.harCRUD.entity.Request;
-import com.instahipsta.harCRUD.dto.RequestDTO;
+import com.instahipsta.harCRUD.model.entity.Request;
+import com.instahipsta.harCRUD.model.dto.RequestDTO;
 import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
