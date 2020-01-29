@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.entity;
+package com.instahipsta.harCRUD.model.entity;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpMethod;

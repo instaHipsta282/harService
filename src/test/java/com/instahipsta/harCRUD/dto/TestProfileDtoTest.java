@@ -1,6 +1,7 @@
 package com.instahipsta.harCRUD.dto;
 
-import com.instahipsta.harCRUD.entity.Request;
+import com.instahipsta.harCRUD.model.entity.Request;
+import com.instahipsta.harCRUD.model.dto.TestProfileDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

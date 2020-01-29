@@ -1,9 +1,9 @@
 package com.instahipsta.harCRUD.mapper;
 
-import com.instahipsta.harCRUD.dto.RequestDTO;
-import com.instahipsta.harCRUD.dto.TestProfileDTO;
-import com.instahipsta.harCRUD.entity.Request;
-import com.instahipsta.harCRUD.entity.TestProfile;
+import com.instahipsta.harCRUD.model.dto.RequestDTO;
+import com.instahipsta.harCRUD.model.dto.TestProfileDTO;
+import com.instahipsta.harCRUD.model.entity.Request;
+import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
 import org.junit.Assert;

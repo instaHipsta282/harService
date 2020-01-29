@@ -1,6 +1,6 @@
 package com.instahipsta.harCRUD.repository;
 
-import com.instahipsta.harCRUD.entity.Har;
+import com.instahipsta.harCRUD.model.entity.Har;
 import org.springframework.data.repository.CrudRepository;
 
 

@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.entity;
+package com.instahipsta.harCRUD.model.entity;
 
 import javax.persistence.*;
 

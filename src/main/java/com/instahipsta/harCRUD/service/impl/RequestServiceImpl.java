@@ -1,8 +1,8 @@
 package com.instahipsta.harCRUD.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.instahipsta.harCRUD.entity.Request;
-import com.instahipsta.harCRUD.entity.TestProfile;
+import com.instahipsta.harCRUD.model.entity.Request;
+import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
