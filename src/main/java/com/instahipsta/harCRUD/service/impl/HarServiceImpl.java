@@ -2,15 +2,14 @@ package com.instahipsta.harCRUD.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.mapper.HarMapper;
 import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
-import com.instahipsta.harCRUD.mapper.HarMapper;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,11 +23,11 @@ public class HarServiceImpl implements HarService {
     private HarMapper mapper;
     private HarRepo harRepo;
 
-    @Value("${file.downloads}")
-    private String downloadsPath;
-
     @Autowired
-    public HarServiceImpl(HarRepo harRepo, ObjectMapper objectMapper, HarMapper mapper) {
+    public HarServiceImpl(HarRepo harRepo,
+                          ObjectMapper objectMapper,
+                          HarMapper mapper) {
+
         this.objectMapper = objectMapper;
         this.harRepo = harRepo;
         this.mapper = mapper;
@@ -49,7 +48,11 @@ public class HarServiceImpl implements HarService {
     }
 
     @Override
-    public Har create(String version, String browser, String browserVersion, String resultFileName) {
+    public Har create(String version,
+                      String browser,
+                      String browserVersion,
+                      String resultFileName) {
+
         return new Har(version, browser, browserVersion, resultFileName);
     }
 
@@ -57,7 +60,6 @@ public class HarServiceImpl implements HarService {
     public Har createHarFromFile(Path filePath) {
         try {
             JsonNode log = objectMapper.readTree(filePath.toFile()).path("log");
-
             String version = log.path("version")
                     .toString().replaceAll("\"", "");
             String browser = log.path("browser")

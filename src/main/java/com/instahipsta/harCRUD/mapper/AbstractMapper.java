@@ -15,7 +15,9 @@ public abstract class AbstractMapper<E extends Entityable, D extends Transferabl
     private Class<E> entityClass;
     private Class<D> dtoClass;
 
-    public AbstractMapper(Class<E> entityClass, Class<D> dtoClass) {
+    public AbstractMapper(Class<E> entityClass,
+                          Class<D> dtoClass) {
+
         this.entityClass = entityClass;
         this.dtoClass = dtoClass;
     }

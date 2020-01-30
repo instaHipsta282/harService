@@ -15,7 +15,11 @@ public class Har implements Entityable{
     private String browserVersion;
     private String fileName;
 
-    public Har(String version, String browser, String browserVersion, String fileName) {
+    public Har(String version,
+               String browser,
+               String browserVersion,
+               String fileName) {
+
         this.version = version;
         this.browser = browser;
         this.browserVersion = browserVersion;
@@ -43,21 +47,4 @@ public class Har implements Entityable{
     public String getFileName() { return fileName; }
 
     public void setFileName(String fileName) { this.fileName = fileName; }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Har har = (Har) o;
-//        return Objects.equals(id, har.id) &&
-//                Objects.equals(version, har.version) &&
-//                Objects.equals(browser, har.browser) &&
-//                Objects.equals(browserVersion, har.browserVersion) &&
-//                Objects.equals(fileName, har.fileName);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(id, version, browser, browserVersion, fileName);
-//    }
 }

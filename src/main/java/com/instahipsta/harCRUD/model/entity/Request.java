@@ -34,8 +34,13 @@ public class Request implements Entityable {
     @ManyToOne
     private TestProfile testProfile;
 
-    public Request(String url, String body, Map<String, String> headers, Map<String, String> params,
-                   HttpMethod method, TestProfile testProfile) {
+    public Request(String url,
+                   String body,
+                   Map<String, String> headers,
+                   Map<String, String> params,
+                   HttpMethod method,
+                   TestProfile testProfile) {
+
         this.url = url;
         this.body = body;
         this.headers = headers;

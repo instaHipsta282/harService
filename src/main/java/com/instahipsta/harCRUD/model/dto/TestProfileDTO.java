@@ -12,7 +12,10 @@ public class TestProfileDTO implements Transferable {
 
     public TestProfileDTO() {}
 
-    public TestProfileDTO(Long id, List<Request> requests, int requestsCount) {
+    public TestProfileDTO(Long id,
+                          List<Request> requests,
+                          int requestsCount) {
+
         this.id = id;
         this.requests = requests;
         this.requestsCount = requestsCount;

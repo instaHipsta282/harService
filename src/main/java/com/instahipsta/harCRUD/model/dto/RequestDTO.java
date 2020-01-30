@@ -15,9 +15,15 @@ public class RequestDTO implements Transferable {
     private Double perc;
     private long testProfileId;
 
-    public RequestDTO(Long id, String url, String body,
-                      Map<String, String> headers, Map<String, String> params,
-                      HttpMethod method, Double perc, long testProfileId) {
+    public RequestDTO(Long id,
+                      String url,
+                      String body,
+                      Map<String, String> headers,
+                      Map<String, String> params,
+                      HttpMethod method,
+                      Double perc,
+                      long testProfileId) {
+
         this.id = id;
         this.url = url;
         this.body = body;

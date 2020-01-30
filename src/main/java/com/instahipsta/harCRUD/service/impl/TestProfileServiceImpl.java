@@ -27,8 +27,10 @@ public class TestProfileServiceImpl implements TestProfileService {
     private ObjectMapper objectMapper;
 
     @Autowired
-    public TestProfileServiceImpl(TestProfileRepo testProfileRepo, RequestService requestService,
+    public TestProfileServiceImpl(TestProfileRepo testProfileRepo,
+                                  RequestService requestService,
                                   ObjectMapper objectMapper) {
+
         this.testProfileRepo = testProfileRepo;
         this.requestService = requestService;
         this.objectMapper = objectMapper;
@@ -36,8 +38,7 @@ public class TestProfileServiceImpl implements TestProfileService {
 
     @Override
     public TestProfile save(TestProfile testProfile) {
-        int requestsCount =
-                testProfile.getRequests() == null ? 0 : testProfile.getRequests().size();
+        int requestsCount = testProfile.getRequests() == null ? 0 : testProfile.getRequests().size();
 
         testProfile.setRequestsCount(requestsCount);
         return testProfileRepo.save(testProfile);
@@ -73,7 +74,9 @@ public class TestProfileServiceImpl implements TestProfileService {
     }
 
     @Override
-    public Request entryToRequest(JsonNode entry, TestProfile testProfile) {
+    public Request entryToRequest(JsonNode entry,
+                                  TestProfile testProfile) {
+
         JsonNode request = entry.path("request");
 
         String url = request.path("url").asText();
