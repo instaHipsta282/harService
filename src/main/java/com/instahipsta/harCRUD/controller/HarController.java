@@ -23,22 +23,24 @@ import java.io.IOException;
 @RequestMapping("/har")
 public class HarController {
 
-    @Autowired
     private ObjectMapper objectMapper;
     private FileService fileService;
     private HarService harService;
     private RabbitTemplate rabbitTemplate;
-    @Value("${file.downloads}")
     private String downloadPath;
 
     @Autowired
     public HarController(FileService fileService,
                          HarService harService,
-                         RabbitTemplate rabbitTemplate) {
+                         RabbitTemplate rabbitTemplate,
+                         ObjectMapper objectMapper,
+                         @Value("${file.downloads}") String downloadPath) {
 
         this.fileService = fileService;
         this.harService = harService;
         this.rabbitTemplate = rabbitTemplate;
+        this.objectMapper = objectMapper;
+        this.downloadPath = downloadPath;
     }
 
     public HarController() {}
