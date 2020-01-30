@@ -16,8 +16,12 @@ public class FileServiceImpl implements FileService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
-    @Value("${file.downloads}")
+
     private String downloadPath;
+
+    public FileServiceImpl(@Value("${file.downloads}") String downloadPath) {
+        this.downloadPath = downloadPath;
+    }
 
     @Override
     public String saveFile(MultipartFile file) {
