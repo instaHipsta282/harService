@@ -23,6 +23,10 @@ spring:
     host: rabbitmq
     username: root
     password: root
+    template:
+      exchange: harExchange
+      default-receive-queue: harQueue
+      routing-key: har
   liquibase:
     enabled: true
     change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
@@ -61,6 +65,10 @@ spring:
     host: 127.0.0.1
     username: root
     password: root
+    template:
+      exchange: harExchange
+      default-receive-queue: harQueue
+      routing-key: har
   liquibase:
     enabled: true
     change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
