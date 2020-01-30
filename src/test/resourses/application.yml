@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: test
+---
+spring:
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: create
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/har_service_test
+    password: root
+    username: root
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  rabbitmq:
+    host: 127.0.0.1
+    username: root
+    password: root
+  liquibase:
+    enabled: true
+    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
+file:
+  downloads: test_downloads
+  filesForTests: filesForTests
