@@ -62,17 +62,18 @@ public class AbstractMapperTest {
         testProfile.setRequests(new ArrayList<>());
         TestProfile savedTestProfile = testProfileService.save(testProfile);
 
-        this.request = requestService.save(new Request(url, body, headers, params, method, savedTestProfile));
+        Request newRequest = requestService.create(url, body, headers, params, method, savedTestProfile);
+        this.request = requestService.save(newRequest);
         this.requestDTO = new RequestDTO(id, url, body, headers, params, method, perc,testProfileId);
 
-        this.testProfile = new TestProfile(new ArrayList<>());
+        this.testProfile = testProfileService.create(new ArrayList<>());
         this.testProfileDTO = new TestProfileDTO(1L, new ArrayList<>(), 7);
     }
 
     @Test
     public void toEntityTest() throws Exception {
         Request mappedRequest = mapper.toEntity(requestDTO);
-        Assert.assertEquals(mappedRequest.getTestProfile().getId(), (Long)requestDTO.getTestProfileId());
+        Assert.assertEquals(mappedRequest.getTestProfile().getId(), requestDTO.getTestProfileId());
     }
 
     @Test
@@ -90,7 +91,7 @@ public class AbstractMapperTest {
     @Test
     public void toDtoTest() throws Exception {
         RequestDTO mappedDTO = mapper.toDto(request);
-        Assert.assertEquals((Long)mappedDTO.getTestProfileId(), request.getTestProfile().getId());
+        Assert.assertEquals(mappedDTO.getTestProfileId(), request.getTestProfile().getId());
     }
 
     @Test

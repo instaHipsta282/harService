@@ -7,8 +7,8 @@ import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,22 +16,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class HarServiceImpl implements HarService {
 
-    private static final Logger logger = LoggerFactory.getLogger(HarServiceImpl.class);
     private ObjectMapper objectMapper;
     private HarMapper mapper;
     private HarRepo harRepo;
-
-    @Autowired
-    public HarServiceImpl(HarRepo harRepo,
-                          ObjectMapper objectMapper,
-                          HarMapper mapper) {
-
-        this.objectMapper = objectMapper;
-        this.harRepo = harRepo;
-        this.mapper = mapper;
-    }
 
     @Override
     public HarDTO save(Har har) {
@@ -53,7 +44,12 @@ public class HarServiceImpl implements HarService {
                       String browserVersion,
                       String resultFileName) {
 
-        return new Har(version, browser, browserVersion, resultFileName);
+        Har har = new Har();
+        har.setVersion(version);
+        har.setBrowser(browser);
+        har.setBrowserVersion(browserVersion);
+        har.setFileName(resultFileName);
+        return har;
     }
 
     @Override
@@ -69,7 +65,7 @@ public class HarServiceImpl implements HarService {
             return create(version, browser, browserVersion, filePath.getFileName().toString());
         }
         catch (IOException e) {
-            logger.error("Failed to read JSON parse", e);
+            log.error("Failed to read JSON parse", e);
             return null;
         }
     }

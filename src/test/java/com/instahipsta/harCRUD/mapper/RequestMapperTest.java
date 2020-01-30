@@ -57,20 +57,21 @@ public class RequestMapperTest {
         testProfile.setRequests(new ArrayList<>());
         TestProfile savedTestProfile = testProfileService.save(testProfile);
 
-        this.request = requestService.save(new Request(url, body, headers, params, method, savedTestProfile));
+        Request newRequest = requestService.create(url, body, headers, params, method, savedTestProfile);
+        this.request = requestService.save(newRequest);
         this.requestDTO = new RequestDTO(id, url, body, headers, params, method, perc,testProfileId);
     }
 
     @Test
     public void mapSpecificFieldsEntityDtoTest() throws Exception {
         mapper.mapSpecificFields(request, emptyRequestDTO);
-        Assert.assertEquals(request.getTestProfile().getId(), (Long)emptyRequestDTO.getTestProfileId());
+        Assert.assertEquals(request.getTestProfile().getId(), emptyRequestDTO.getTestProfileId());
     }
 
     @Test
     public void mapSpecificFieldsDtoEntityTest() throws Exception {
         mapper.mapSpecificFields(requestDTO, emptyRequest);
-        Assert.assertEquals((Long)requestDTO.getTestProfileId(), emptyRequest.getTestProfile().getId());
+        Assert.assertEquals(requestDTO.getTestProfileId(), emptyRequest.getTestProfile().getId());
     }
 
     @Test(expected = NullPointerException.class)

@@ -87,8 +87,8 @@ public class TestProfileServiceTest {
 
     @Test
     public void saveTest() throws Exception {
-        TestProfile testProfile = new TestProfile(new ArrayList<>());
-        Request request = new Request(url, body, headers, params, httpMethod, testProfile);
+        TestProfile testProfile = testProfileService.create(new ArrayList<>());
+        Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
         testProfile.getRequests().add(request);
         TestProfile savedTestProfile = testProfileService.save(testProfile);
 

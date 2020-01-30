@@ -7,8 +7,8 @@ import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -19,22 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class TestProfileServiceImpl implements TestProfileService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TestProfileServiceImpl.class);
     private TestProfileRepo testProfileRepo;
     private RequestService requestService;
     private ObjectMapper objectMapper;
-
-    @Autowired
-    public TestProfileServiceImpl(TestProfileRepo testProfileRepo,
-                                  RequestService requestService,
-                                  ObjectMapper objectMapper) {
-
-        this.testProfileRepo = testProfileRepo;
-        this.requestService = requestService;
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public TestProfile save(TestProfile testProfile) {
@@ -51,7 +42,10 @@ public class TestProfileServiceImpl implements TestProfileService {
 
     @Override
     public TestProfile create(List<Request> requests) {
-        return new TestProfile(requests);
+        TestProfile testProfile = new TestProfile();
+        testProfile.setRequests(requests);
+        testProfile.setRequestsCount(requests.size());
+        return testProfile;
     }
 
     @Override
@@ -62,7 +56,7 @@ public class TestProfileServiceImpl implements TestProfileService {
             entries = objectMapper.readTree(har).path("log").path("entries");
         }
         catch (IOException e) {
-            logger.error("Failed to JSON parse", e);
+            log.error("Failed to JSON parse", e);
         }
 
         for (JsonNode entry : entries) {

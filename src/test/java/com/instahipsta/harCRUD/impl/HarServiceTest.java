@@ -1,8 +1,8 @@
 package com.instahipsta.harCRUD.impl;
 
-import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.model.dto.HarDTO;
-import com.instahipsta.harCRUD.service.impl.HarServiceImpl;
+import com.instahipsta.harCRUD.model.entity.Har;
+import com.instahipsta.harCRUD.service.HarService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,14 +21,14 @@ import java.io.File;
 public class HarServiceTest {
 
     @Autowired
-    private HarServiceImpl harService;
+    private HarService harService;
     private long harId;
     @Value("${file.filesForTests}")
     private String filesToTests;
 
     @Before
     public void createHar() {
-        Har har = new Har("2", "Chrome", "2", "/olollo");
+        Har har = harService.create("2", "Chrome", "2", "/olollo");
         HarDTO savedHar = harService.save(har);
         harId = savedHar.getId();
     }

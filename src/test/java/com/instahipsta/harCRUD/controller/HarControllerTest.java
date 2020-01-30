@@ -62,14 +62,7 @@ public class HarControllerTest {
     }
 
     @Test
-    public void constructorTest() throws Exception {
-        HarController harController = new HarController();
-        Assert.assertNotNull(harController);
-    }
-
-    @Test
     public void uploadHarTest() throws Exception {
-        System.out.println(multipartFile);
         boolean isOk = this.mockMvc.perform(multipart("/har/upload")
                 .file(multipartFile)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
