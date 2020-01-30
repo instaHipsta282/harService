@@ -5,8 +5,9 @@ import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.service.FileService;
 import com.instahipsta.harCRUD.service.HarService;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,29 +22,19 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/har")
+@RequiredArgsConstructor
 public class HarController {
 
+    @NonNull
     private ObjectMapper objectMapper;
+    @NonNull
     private FileService fileService;
+    @NonNull
     private HarService harService;
+    @NonNull
     private RabbitTemplate rabbitTemplate;
+    @Value("${file.downloads}")
     private String downloadPath;
-
-    @Autowired
-    public HarController(FileService fileService,
-                         HarService harService,
-                         RabbitTemplate rabbitTemplate,
-                         ObjectMapper objectMapper,
-                         @Value("${file.downloads}") String downloadPath) {
-
-        this.fileService = fileService;
-        this.harService = harService;
-        this.rabbitTemplate = rabbitTemplate;
-        this.objectMapper = objectMapper;
-        this.downloadPath = downloadPath;
-    }
-
-    public HarController() {}
 
     @Transactional
     @PostMapping("upload")

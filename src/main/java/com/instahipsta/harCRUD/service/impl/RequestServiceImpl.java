@@ -5,7 +5,7 @@ import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.RequestService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
     private RequestRepo requestRepo;
-
-    @Autowired
-    public RequestServiceImpl(RequestRepo requestRepo) {
-        this.requestRepo = requestRepo;
-    }
 
     @Override
     public Map<String, String> getMapValues(JsonNode mapValues) {
@@ -40,7 +36,16 @@ public class RequestServiceImpl implements RequestService {
                           HttpMethod method,
                           TestProfile testProfile) {
 
-        return new Request(url, body, headers, params, method, testProfile);
+        Request request = new Request();
+        request.setUrl(url);
+        request.setBody(body);
+        request.setHeaders(headers);
+        request.setParams(params);
+        request.setMethod(method);
+        request.setPerc(0.0);
+        request.setTestProfile(testProfile);
+
+        return request;
     }
 
     @Override

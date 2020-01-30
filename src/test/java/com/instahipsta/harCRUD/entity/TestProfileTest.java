@@ -53,7 +53,7 @@ public class TestProfileTest {
         params.put("param1", "value1");
         params.put("param2", "value2");
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
-        fullTestProfile = new TestProfile(asList(request));
+        fullTestProfile = testProfileService.create(asList(request));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TestProfileTest {
     @Test
     public void constructorWithParametersTest() throws Exception {
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
-        TestProfile testProfile = new TestProfile(asList(request));
+        TestProfile testProfile = testProfileService.create(asList(request));
         Assert.assertEquals("https://yandex.ru", testProfile.getRequests().get(0).getUrl());
     }
 
@@ -73,13 +73,6 @@ public class TestProfileTest {
     public void getIdTest() throws Exception {
         Long id = testProfile.getId();
         Assert.assertNotNull(id);
-    }
-
-    @Test
-    public void setIdTest() throws Exception {
-        testProfile.setId(376L);
-        long newId = testProfile.getId();
-        Assert.assertEquals(376, newId);
     }
 
     @Test

@@ -66,20 +66,6 @@ public class RequestTest {
     }
 
     @Test
-    public void getIdTest() throws Exception {
-        request.setId(1L);
-        Long id = request.getId();
-        Assert.assertNotNull(id);
-    }
-
-    @Test
-    public void setIdTest() throws Exception {
-        request.setId(376L);
-        long newId = request.getId();
-        Assert.assertEquals(376, newId);
-    }
-
-    @Test
     public void getUrlTest() throws Exception {
         Assert.assertEquals("https://yandex.ru", request.getUrl());
     }
@@ -164,7 +150,7 @@ public class RequestTest {
         requests.add(requestService.create("yandex.ru", body, headers, params, httpMethod, testProfile));
         requests.add(requestService.create("google.com", body, headers, params, httpMethod, testProfile));
         requests.add(requestService.create("rambler.ru", body, headers, params, httpMethod, testProfile));
-        TestProfile newTestProfile = new TestProfile(requests);
+        TestProfile newTestProfile = testProfileService.create(requests);
         request.setTestProfile(newTestProfile);
         Assert.assertEquals(3, request.getTestProfile().getRequests().size());
     }

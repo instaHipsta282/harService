@@ -1,10 +1,12 @@
 package com.instahipsta.harCRUD.entity;
 
 import com.instahipsta.harCRUD.model.entity.Har;
+import com.instahipsta.harCRUD.service.HarService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -14,6 +16,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class HarTest {
 
+    @Autowired
+    private HarService harService;
     private String version;
     private String browser;
     private String browserVersion;
@@ -26,31 +30,7 @@ public class HarTest {
         this.browser = "Yandex";
         this.browserVersion = "1";
         this.fileName = "/huh";
-        this.har = new Har("2", "Chrome", "2", "/olollo");
-    }
-
-    @Test
-    public void constructorWithoutArguments() throws Exception {
-        Har har = new Har();
-        Assert.assertNotNull(har);
-    }
-
-    @Test
-    public void constructorWithArguments() throws Exception {
-        Har har = new Har(version, browser, browserVersion, fileName);
-        Assert.assertEquals("Yandex", har.getBrowser());
-    }
-
-    @Test
-    public void getIdTest() throws Exception {
-        har.setId(9L);
-        Assert.assertNotNull(har.getId());
-    }
-
-    @Test
-    public void setIdTest() throws Exception {
-        har.setId(99L);
-        Assert.assertEquals((Long) 99L, har.getId());
+        this.har = harService.create("2", "Chrome", "2", "/olollo");
     }
 
     @Test

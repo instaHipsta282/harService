@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.model.entity.TestProfile;
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Service
 public interface RequestService {
     Map<String, String> getMapValues(JsonNode mapValues);
 
