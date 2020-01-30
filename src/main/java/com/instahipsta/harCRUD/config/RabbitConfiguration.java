@@ -18,7 +18,9 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public DirectExchange directExchange() { return new DirectExchange("harExchange"); }
+    public DirectExchange directExchange() {
+        return new DirectExchange("harExchange");
+    }
 
     @Bean
     public Binding harBinding() {

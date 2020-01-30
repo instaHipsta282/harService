@@ -33,12 +33,18 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Request create(String url, String body, Map<String, String> headers,
-                          Map<String, String> params, HttpMethod method,
+    public Request create(String url,
+                          String body,
+                          Map<String, String> headers,
+                          Map<String, String> params,
+                          HttpMethod method,
                           TestProfile testProfile) {
+
         return new Request(url, body, headers, params, method, testProfile);
     }
 
     @Override
-    public Request save(Request request) { return requestRepo.save(request); }
+    public Request save(Request request) {
+        return requestRepo.save(request);
+    }
 }

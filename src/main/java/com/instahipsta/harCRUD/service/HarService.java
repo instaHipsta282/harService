@@ -10,7 +10,10 @@ public interface HarService {
 
     Har findById(Long id);
 
-    Har create(String version, String browser, String browserVersion, String resultFileName);
+    Har create(String version,
+               String browser,
+               String browserVersion,
+               String resultFileName);
 
     Har createHarFromFile(Path filePath);
 }

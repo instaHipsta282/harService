@@ -11,7 +11,12 @@ public class HarDTO implements Transferable {
 
     public HarDTO() {}
 
-    public HarDTO(Long id, String version, String browser, String browserVersion, String fileName) {
+    public HarDTO(Long id,
+                  String version,
+                  String browser,
+                  String browserVersion,
+                  String fileName) {
+
         this.id = id;
         this.version = version;
         this.browser = browser;

@@ -17,7 +17,9 @@ public class RequestMapper extends AbstractMapper<Request, RequestDTO> {
     private final TestProfileRepo testProfileRepo;
 
     @Autowired
-    public RequestMapper(ModelMapper mapper, TestProfileRepo testProfileRepo) {
+    public RequestMapper(ModelMapper mapper,
+                         TestProfileRepo testProfileRepo) {
+
         super(Request.class, RequestDTO.class);
         this.mapper = mapper;
         this.testProfileRepo = testProfileRepo;
@@ -32,12 +34,16 @@ public class RequestMapper extends AbstractMapper<Request, RequestDTO> {
     }
 
     @Override
-    void mapSpecificFields(RequestDTO source, Request destination) {
+    void mapSpecificFields(RequestDTO source,
+                           Request destination) {
+
         destination.setTestProfile(testProfileRepo.findById(source.getTestProfileId()).orElse(null));
     }
 
     @Override
-    void mapSpecificFields(Request source, RequestDTO destination) {
+    void mapSpecificFields(Request source,
+                           RequestDTO destination) {
+
         destination.setTestProfileId(getId(source));
     }
 

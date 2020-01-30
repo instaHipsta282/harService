@@ -32,7 +32,10 @@ public class HarController {
     private String downloadPath;
 
     @Autowired
-    public HarController(FileService fileService, HarService harService, RabbitTemplate rabbitTemplate) {
+    public HarController(FileService fileService,
+                         HarService harService,
+                         RabbitTemplate rabbitTemplate) {
+
         this.fileService = fileService;
         this.harService = harService;
         this.rabbitTemplate = rabbitTemplate;

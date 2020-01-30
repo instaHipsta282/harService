@@ -18,5 +18,6 @@ public interface TestProfileService {
 
     TestProfile harToTestProfile(byte[] har);
 
-    Request entryToRequest(JsonNode entry, TestProfile testProfile);
+    Request entryToRequest(JsonNode entry,
+                           TestProfile testProfile);
 }
