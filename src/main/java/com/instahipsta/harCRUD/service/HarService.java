@@ -18,4 +18,6 @@ public interface HarService {
                String resultFileName);
 
     Har createHarFromFile(Path filePath);
+
+    void sendHarInQueue(byte[] data);
 }

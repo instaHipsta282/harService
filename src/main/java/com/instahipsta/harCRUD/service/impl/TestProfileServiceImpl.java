@@ -9,6 +9,7 @@ import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class TestProfileServiceImpl implements TestProfileService {
     private TestProfileRepo testProfileRepo;
     private RequestService requestService;
     private ObjectMapper objectMapper;
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public TestProfile save(TestProfile testProfile) {
@@ -56,6 +58,7 @@ public class TestProfileServiceImpl implements TestProfileService {
             entries = objectMapper.readTree(har).path("log").path("entries");
         }
         catch (IOException e) {
+            rabbitTemplate.convertAndSend("error", e.getMessage());
             log.error("Failed to JSON parse", e);
         }
 

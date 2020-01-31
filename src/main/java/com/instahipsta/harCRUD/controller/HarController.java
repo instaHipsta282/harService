@@ -31,12 +31,9 @@ public class HarController {
     private FileService fileService;
     @NonNull
     private HarService harService;
-    @NonNull
-    private RabbitTemplate rabbitTemplate;
     @Value("${file.downloads}")
     private String downloadPath;
 
-    @Transactional
     @PostMapping("upload")
     public String uploadHar(@RequestParam MultipartFile file) throws IOException {
         byte[] data = file.getBytes();
@@ -49,7 +46,7 @@ public class HarController {
         }
 
         if (resultFileName != null && savedHar != null) {
-            rabbitTemplate.convertAndSend("har", data);
+            harService.sendHarInQueue(data);
         }
         return objectMapper.writeValueAsString(savedHar);
     }

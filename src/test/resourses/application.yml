@@ -20,10 +20,15 @@ spring:
     host: 127.0.0.1
     username: root
     password: root
-    template:
-      exchange: harExchange
-      default-receive-queue: harQueue
-      routing-key: har
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          max-interval: 10000
+          multiplier: 2.0
+          stateless: true
   liquibase:
     enabled: true
     change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
