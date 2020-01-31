@@ -8,28 +8,41 @@ import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UUID;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class HarServiceImpl implements HarService {
-
+    @NonNull
     private ObjectMapper objectMapper;
+    @NonNull
     private HarMapper mapper;
+    @NonNull
     private HarRepo harRepo;
+    @NonNull
+    private RabbitTemplate rabbitTemplate;
+    @Value("${rabbitmq.harExchange}")
+    private String harExchange;
+    @Value("${rabbitmq.harRoutingKey}")
+    private String harRoutingKey;
 
     @Override
     public HarDTO save(Har har) {
-        Har savedHar =  harRepo.save(har);
+        Har savedHar = harRepo.save(har);
         if (savedHar.getVersion().isEmpty()) {
             return null;
-        }
-        else return mapper.toDto(savedHar);
+        } else return mapper.toDto(savedHar);
     }
 
     @Override
@@ -62,10 +75,16 @@ public class HarServiceImpl implements HarService {
             String browserVersion = log.path("browser")
                     .path("version").toString().replaceAll("\"", "");
             return create(version, browser, browserVersion, filePath.getFileName().toString());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("Failed to read JSON parse", e);
             return null;
         }
+    }
+
+    @Override
+    @Transactional
+    public void sendHarInQueue(byte[] data) {
+        log.info("Sending message length: {}", (data.length));
+        rabbitTemplate.convertAndSend(harExchange, harRoutingKey, data);
     }
 }
