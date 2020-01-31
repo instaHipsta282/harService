@@ -9,10 +9,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class ApplicationTest {
+public class HarServiceApplicationTest {
 
     @Test
     public void applicationTest() throws Exception {
-        Application.main(new String[]{"--server.port=8083", "--spring.profiles.active=test"});
+        HarServiceApplication.main(new String[]{"--server.port=8083", "--spring.profiles.active=test"});
     }
 }

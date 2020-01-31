@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Import;
 
 @Import(AppConfiguration.class)
 @SpringBootApplication
-public class Application {
+public class HarServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(HarServiceApplication.class, args);
     }
 }

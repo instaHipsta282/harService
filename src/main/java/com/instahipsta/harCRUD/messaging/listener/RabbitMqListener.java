@@ -1,5 +1,6 @@
 package com.instahipsta.harCRUD.messaging.listener;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.instahipsta.harCRUD.service.TestProfileService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -20,9 +21,7 @@ public class RabbitMqListener {
     private TestProfileService testProfileService;
 
     @RabbitListener(queues = "${rabbitmq.harQueue}")
-    public void harWorker(String message) {
-        testProfileService.harToTestProfile(message.getBytes());
-        log.info("Receiving message: {}", message.substring(0, 100));
-
+    public void harWorker(JsonNode message) {
+        testProfileService.harToTestProfile(message);
     }
 }

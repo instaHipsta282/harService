@@ -1,5 +1,6 @@
 package com.instahipsta.harCRUD.model.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,5 @@ public class HarDTO implements Transferable {
     private String version;
     private String browser;
     private String browserVersion;
-    private String fileName;
 
 }

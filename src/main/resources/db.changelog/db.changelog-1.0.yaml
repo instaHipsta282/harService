@@ -22,8 +22,8 @@ databaseChangeLog:
               - column:
                   name: version
                   type: varchar(255)
+              - column:
+                  name: content
+                  type: jsonb
                   constraints:
                     nullable: false
-              - column:
-                  name: file_name
-                  type: varchar(255)

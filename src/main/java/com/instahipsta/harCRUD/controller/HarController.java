@@ -1,22 +1,18 @@
 package com.instahipsta.harCRUD.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.service.FileService;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 
 
@@ -31,23 +27,15 @@ public class HarController {
     private FileService fileService;
     @NonNull
     private HarService harService;
-    @Value("${file.downloads}")
-    private String downloadPath;
 
     @PostMapping("upload")
     public String uploadHar(@RequestParam MultipartFile file) throws IOException {
-        byte[] data = file.getBytes();
-        HarDTO savedHar = null;
-        String resultFileName = fileService.saveFile(file);
-        if (resultFileName != null) {
-            File savedFile = new File(downloadPath + "/" + resultFileName);
-            Har har = harService.createHarFromFile(savedFile.toPath());
-            savedHar = harService.save(har);
-        }
+        Har har = harService.createHarFromFile(file);
+        Har savedHar = harService.save(har);
 
-        if (resultFileName != null && savedHar != null) {
-            harService.sendHarInQueue(data);
+        if (savedHar != null) {
+            harService.sendHarInQueue(savedHar.getContent());
         }
-        return objectMapper.writeValueAsString(savedHar);
+        return objectMapper.writeValueAsString(harService.harToDto(savedHar));
     }
 }
