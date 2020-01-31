@@ -35,3 +35,11 @@ spring:
 file:
   downloads: test_downloads
   filesForTests: filesForTests
+
+rabbitmq:
+  harQueue: harQueue
+  deadletterQueue: deadletterQueue
+  harExchange: harExchange
+  deadletterExchange: deadletterExchange
+  harRoutingKey: har
+  deadletterRoutingKey: deadletterRoutingKey
