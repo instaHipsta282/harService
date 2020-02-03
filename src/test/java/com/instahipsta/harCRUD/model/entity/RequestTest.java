@@ -1,27 +1,20 @@
-package com.instahipsta.harCRUD.entity;
+package com.instahipsta.harCRUD.model.entity;
 
-import com.instahipsta.harCRUD.model.entity.Request;
-import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ActiveProfiles("test")
 @SpringBootTest
-@RunWith(SpringJUnit4ClassRunner.class)
 public class RequestTest {
 
     @Autowired
@@ -36,7 +29,7 @@ public class RequestTest {
     private TestProfile testProfile;
     private Request request;
 
-    @Before
+    @BeforeEach
     public void initFields() {
         url = "https://yandex.ru";
         body = "{}";
@@ -54,42 +47,49 @@ public class RequestTest {
     }
 
     @Test
-    public void constructorWithoutArguments() throws Exception {
+    public void constructorWithoutArguments() {
         Request request = new Request();
-        Assert.assertNotNull(request);
+        Assertions.assertNotNull(request);
     }
 
     @Test
     public void constructorWithArguments() throws Exception {
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
-        Assert.assertEquals("https://yandex.ru", request.getUrl());
+        Assertions.assertEquals("hvalue1", request.getHeaders().get("header1"));
+        Assertions.assertEquals("hvalue2", request.getHeaders().get("header2"));
+        Assertions.assertEquals("value1", request.getParams().get("param1"));
+        Assertions.assertEquals("value2", request.getParams().get("param2"));
+        Assertions.assertNotNull(request.getTestProfile());
+        Assertions.assertEquals("https://yandex.ru", request.getUrl());
+        Assertions.assertEquals(0.0, request.getPerc());
+        Assertions.assertEquals(HttpMethod.GET, request.getMethod());
     }
 
     @Test
     public void getUrlTest() throws Exception {
-        Assert.assertEquals("https://yandex.ru", request.getUrl());
+        Assertions.assertEquals("https://yandex.ru", request.getUrl());
     }
 
     @Test
     public void setUrlTest() throws Exception {
         request.setUrl("hohoh");
-        Assert.assertEquals("hohoh", request.getUrl());
+        Assertions.assertEquals("hohoh", request.getUrl());
     }
 
     @Test
     public void getBodyTest() throws Exception {
-        Assert.assertEquals("{}", request.getBody());
+        Assertions.assertEquals("{}", request.getBody());
     }
 
     @Test
     public void setBodyTest() throws Exception {
         request.setBody("body");
-        Assert.assertEquals("body", request.getBody());
+        Assertions.assertEquals("body", request.getBody());
     }
 
     @Test
     public void getHeadersTest() throws Exception {
-        Assert.assertEquals(2, request.getHeaders().size());
+        Assertions.assertEquals(2, request.getHeaders().size());
     }
 
     @Test
@@ -99,12 +99,12 @@ public class RequestTest {
         newHeaders.put("header2k", "header2v");
         newHeaders.put("header3k", "header3v");
         request.setHeaders(newHeaders);
-        Assert.assertEquals(3, request.getHeaders().size());
+        Assertions.assertEquals(3, request.getHeaders().size());
     }
 
     @Test
     public void getParamsTest() throws Exception {
-        Assert.assertEquals(2, request.getParams().size());
+        Assertions.assertEquals(2, request.getParams().size());
     }
 
     @Test
@@ -114,34 +114,34 @@ public class RequestTest {
         newParams.put("param2k", "param2v");
         newParams.put("param3k", "param3v");
         request.setParams(newParams);
-        Assert.assertEquals(3, request.getParams().size());
+        Assertions.assertEquals(3, request.getParams().size());
     }
 
     @Test
     public void getMethodTest() throws Exception {
-        Assert.assertEquals(HttpMethod.GET, request.getMethod());
+        Assertions.assertEquals(HttpMethod.GET, request.getMethod());
     }
 
     @Test
     public void setMethodTest() throws Exception {
         request.setMethod(HttpMethod.DELETE);
-        Assert.assertEquals(HttpMethod.DELETE, request.getMethod());
+        Assertions.assertEquals(HttpMethod.DELETE, request.getMethod());
     }
 
     @Test
     public void getPercTest() throws Exception {
-        Assert.assertEquals((Double)0.0, request.getPerc());
+        Assertions.assertEquals((Double)0.0, request.getPerc());
     }
 
     @Test
     public void setPercTest() throws Exception {
         request.setPerc(0.5);
-        Assert.assertEquals((Double)0.5, request.getPerc());
+        Assertions.assertEquals((Double)0.5, request.getPerc());
     }
 
     @Test
     public void getTestProfileTest() throws Exception {
-        Assert.assertNotNull(request.getTestProfile());
+        Assertions.assertNotNull(request.getTestProfile());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class RequestTest {
         requests.add(requestService.create("rambler.ru", body, headers, params, httpMethod, testProfile));
         TestProfile newTestProfile = testProfileService.create(requests);
         request.setTestProfile(newTestProfile);
-        Assert.assertEquals(3, request.getTestProfile().getRequests().size());
+        Assertions.assertEquals(3, request.getTestProfile().getRequests().size());
     }
 
 }

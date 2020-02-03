@@ -1,18 +1,13 @@
 package com.instahipsta.harCRUD;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class HarServiceApplicationTest {
 
     @Test
-    public void applicationTest() throws Exception {
-        HarServiceApplication.main(new String[]{"--server.port=8083", "--spring.profiles.active=test"});
+    void applicationTest() {
+        HarServiceApplication.main(new String[]{});
     }
 }

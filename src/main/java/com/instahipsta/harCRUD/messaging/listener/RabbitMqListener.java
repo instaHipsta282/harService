@@ -1,17 +1,16 @@
 package com.instahipsta.harCRUD.messaging.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.instahipsta.harCRUD.model.entity.Request;
+import com.instahipsta.harCRUD.model.entity.TestProfile;
+import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.transaction.RabbitTransactionManager;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -19,9 +18,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class RabbitMqListener {
 
     private TestProfileService testProfileService;
+    private RequestService requestService;
 
     @RabbitListener(queues = "${rabbitmq.harQueue}")
     public void harWorker(JsonNode message) {
-        testProfileService.harToTestProfile(message);
+        List<Request> requests = requestService.jsonNodeToRequestList(message);
+        TestProfile testProfile = testProfileService.create(requests);
+        testProfileService.save(testProfile);
     }
 }

@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.dto;
+package com.instahipsta.harCRUD.model.dto;
 
 import com.instahipsta.harCRUD.model.dto.HarDTO;
 import org.junit.Assert;
