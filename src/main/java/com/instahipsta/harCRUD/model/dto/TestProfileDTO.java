@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestProfileDTO implements Transferable {
+public class TestProfileDTO {
 
     private Long id;
     private List<Request> requests;

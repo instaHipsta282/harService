@@ -6,7 +6,6 @@ import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,13 +18,10 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class HarServiceImpl implements HarService {
-//    @NonNull
+
     private final ObjectMapper objectMapper;
-//    @NonNull
     private final HarRepo harRepo;
-//    @NonNull
     private final RabbitTemplate rabbitTemplate;
-//    @NonNull
     private final ModelMapper mapper;
     @Value("${rabbitmq.harExchange}")
     private String harExchange;

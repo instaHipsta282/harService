@@ -1,16 +1,18 @@
 package com.instahipsta.harCRUD.model.entity;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class TestProfile implements Entityable {
+public class TestProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "test_profile_id_seq")

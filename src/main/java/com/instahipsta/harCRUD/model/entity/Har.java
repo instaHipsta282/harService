@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class Har implements Entityable {
+public class Har {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "har_id_seq")
