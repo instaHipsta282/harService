@@ -1,18 +1,14 @@
-package com.instahipsta.harCRUD.entity;
+package com.instahipsta.harCRUD.model.entity;
 
-import com.instahipsta.harCRUD.model.entity.Request;
-import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +17,8 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 
-@ActiveProfiles("test")
 @SpringBootTest
-@RunWith(SpringJUnit4ClassRunner.class)
+@ActiveProfiles("test")
 public class TestProfileTest {
 
     @Autowired
@@ -38,7 +33,7 @@ public class TestProfileTest {
     private TestProfile testProfile;
     private TestProfile fullTestProfile;
 
-    @Before
+    @BeforeEach
     public void initFields() {
         url = "https://yandex.ru";
         body = "{}";
@@ -57,45 +52,53 @@ public class TestProfileTest {
     }
 
     @Test
-    public void constructorWithoutParametersTest() throws Exception {
+    public void constructorWithoutParametersTest() {
         TestProfile testProfile = new TestProfile();
-        Assert.assertNotNull(testProfile);
+        Assertions.assertNotNull(testProfile);
     }
 
     @Test
-    public void constructorWithParametersTest() throws Exception {
+    public void constructorWithParametersTest() {
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
         TestProfile testProfile = testProfileService.create(asList(request));
-        Assert.assertEquals("https://yandex.ru", testProfile.getRequests().get(0).getUrl());
+
+        Request newRequest = testProfile.getRequests().get(0);
+        Assertions.assertEquals("hvalue1", newRequest.getHeaders().get("header1"));
+        Assertions.assertEquals("hvalue2", newRequest.getHeaders().get("header2"));
+        Assertions.assertEquals("value1", newRequest.getParams().get("param1"));
+        Assertions.assertEquals("value2", newRequest.getParams().get("param2"));
+        Assertions.assertNotNull(newRequest.getTestProfile());
+        Assertions.assertEquals("https://yandex.ru", newRequest.getUrl());
+        Assertions.assertEquals(0.0, newRequest.getPerc());
+        Assertions.assertEquals(HttpMethod.GET, newRequest.getMethod());
     }
 
     @Test
-    public void getIdTest() throws Exception {
+    public void getIdTest() {
         Long id = testProfile.getId();
-        Assert.assertNotNull(id);
+        Assertions.assertNotNull(id);
     }
 
     @Test
     public void getRequestsTest() throws Exception {
-        Assert.assertEquals(1, fullTestProfile.getRequests().size());
+        Assertions.assertEquals(1, fullTestProfile.getRequests().size());
     }
 
     @Test
     public void setRequestsTest() throws Exception {
-        List<Request> requests = new ArrayList<>();
         Request request = requestService.create(url, "{body}", headers, params, httpMethod, testProfile);
         testProfile.setRequests(asList(request));
-        Assert.assertEquals("{body}", testProfile.getRequests().get(0).getBody());
+        Assertions.assertEquals("{body}", testProfile.getRequests().get(0).getBody());
     }
 
     @Test
     public void getRequestsCountTest() throws Exception {
-        Assert.assertEquals(1, fullTestProfile.getRequestsCount());
+        Assertions.assertEquals(1, fullTestProfile.getRequestsCount());
     }
 
     @Test
     public void setRequestsCountTest() throws Exception {
         fullTestProfile.setRequestsCount(561);
-        Assert.assertEquals(561, fullTestProfile.getRequestsCount());
+        Assertions.assertEquals(561, fullTestProfile.getRequestsCount());
     }
 }

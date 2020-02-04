@@ -1,23 +1,25 @@
 package com.instahipsta.harCRUD.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
+import java.io.IOException;
 
 @Service
 public interface HarService {
-    HarDTO save(Har har);
+    Har save(Har har);
 
-    Har findById(Long id);
+    HarDTO harToDto(Har har);
 
     Har create(String version,
                String browser,
                String browserVersion,
-               String resultFileName);
+               JsonNode content);
 
-    Har createHarFromFile(Path filePath);
+    Har createHarFromFile(byte[] content) throws IOException;
 
-    void sendHarInQueue(byte[] data);
+    void sendHarInQueue(JsonNode entries);
 }

@@ -15,6 +15,5 @@ public class HarDTO implements Transferable {
     private String version;
     private String browser;
     private String browserVersion;
-    private String fileName;
 
 }

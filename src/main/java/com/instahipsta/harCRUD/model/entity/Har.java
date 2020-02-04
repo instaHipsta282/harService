@@ -1,9 +1,13 @@
 package com.instahipsta.harCRUD.model.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 
@@ -11,6 +15,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class Har implements Entityable {
 
     @Id
@@ -22,6 +27,8 @@ public class Har implements Entityable {
     private String version;
     private String browser;
     private String browserVersion;
-    private String fileName;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private JsonNode content;
 
 }

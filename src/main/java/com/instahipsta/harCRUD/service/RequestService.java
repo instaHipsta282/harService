@@ -6,6 +6,7 @@ import com.instahipsta.harCRUD.model.entity.TestProfile;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -20,4 +21,9 @@ public interface RequestService {
                    TestProfile testProfile);
 
     Request save(Request request);
+
+    Request entryToRequest(JsonNode entry,
+                           TestProfile testProfile);
+
+    List<Request> jsonNodeToRequestList(JsonNode entries);
 }

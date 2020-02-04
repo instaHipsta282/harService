@@ -9,7 +9,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -24,6 +26,9 @@ public class RequestServiceImpl implements RequestService {
         if (mapValues.isArray()) {
             mapValues.forEach(entry -> map
                             .put(entry.path("name").asText(), entry.path("value").asText()));
+        }
+        else {
+            map.put(mapValues.path("name").asText(), mapValues.path("value").asText());
         }
         return map;
     }
@@ -51,5 +56,29 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Request save(Request request) {
         return requestRepo.save(request);
+    }
+
+
+    @Override
+    public Request entryToRequest(JsonNode entry,
+                                  TestProfile testProfile) {
+        JsonNode request = entry.path("request");
+
+        String url = request.path("url").asText();
+        String body = request.path("postData").path("text").asText();
+        HttpMethod method = HttpMethod.valueOf(request.path("method").asText());
+        Map<String, String> headers = getMapValues(request.path("headers"));
+        Map<String, String> params = getMapValues(request.path("queryString"));
+        return create(url, body, headers, params, method, testProfile);
+    }
+
+    @Override
+    public List<Request> jsonNodeToRequestList(JsonNode entries) {
+        List<Request> requests = new ArrayList<>();
+        for (JsonNode entry : entries) {
+            Request req = entryToRequest(entry, new TestProfile());
+            requests.add(req);
+        }
+        return requests;
     }
 }
