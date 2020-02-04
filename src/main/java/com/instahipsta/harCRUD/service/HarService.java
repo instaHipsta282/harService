@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public interface HarService {
@@ -22,4 +22,10 @@ public interface HarService {
     Har createHarFromFile(byte[] content) throws IOException;
 
     void sendHarInQueue(JsonNode entries);
+
+    void delete(long id);
+
+    Har find(long id);
+
+    Har update(HarDTO updatedHar);
 }

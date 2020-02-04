@@ -2,15 +2,13 @@ package com.instahipsta.harCRUD.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,6 +22,57 @@ public class HarController {
 
     private final ObjectMapper objectMapper;
     private final HarService harService;
+
+    @PutMapping("update/{id}")
+    public String updateHar(@RequestBody HarDTO har,
+                                            @PathVariable long id) {
+
+        String harDtoString = null;
+        Har findHar = harService.find(id);
+        if (findHar == null) return null;
+        Har updatedHar = harService.update(har);
+
+        try {
+            harDtoString = objectMapper.writeValueAsString(harService.harToDto(updatedHar));
+        } catch (JsonProcessingException e) {
+            log.error("Error parsing har {} {}", updatedHar, e.getMessage());
+        }
+
+        return harDtoString;
+    }
+
+    @GetMapping("get")
+    public String getHar(@RequestParam long id) {
+        Har findHar = harService.find(id);
+        String harDtoString = null;
+
+        if (findHar == null) return null;
+
+        try {
+            harDtoString = objectMapper.writeValueAsString(harService.harToDto(findHar));
+        } catch (JsonProcessingException e) {
+            log.error("Error parsing har {} {}", findHar, e.getMessage());
+        }
+
+        return harDtoString;
+    }
+
+    @GetMapping("delete")
+    public String deleteHar(@RequestParam long id) {
+        Har deletedHar = harService.find(id);
+        String harDtoString = null;
+
+        if (deletedHar == null) return null;
+
+        harService.delete(id);
+        try {
+            harDtoString = objectMapper.writeValueAsString(harService.harToDto(deletedHar));
+        } catch (JsonProcessingException e) {
+            log.error("Error parsing har {} {}", deletedHar, e.getMessage());
+        }
+
+        return harDtoString;
+    }
 
     @PostMapping("upload")
     public String uploadHar(@RequestParam MultipartFile file) {
@@ -43,28 +92,20 @@ public class HarController {
 
         try {
             har = harService.createHarFromFile(content);
-            System.out.println("create har");
             savedHar = harService.save(har);
-            System.out.println(savedHar == null);
-            System.out.println("save har");
         } catch (IOException e) {
             log.error("Error parsing json from file {} {}", file.getOriginalFilename(), e.getMessage());
-            System.out.println("error parsing");
         }
 
         if (savedHar != null) {
             harService.sendHarInQueue(savedHar.getContent());
-            System.out.println("sending");
         }
 
         try {
             harDtoString = objectMapper.writeValueAsString(harService.harToDto(savedHar));
-            System.out.println("hardto");
         } catch (JsonProcessingException e) {
             log.error("Error parsing har {} {}", savedHar, e.getMessage());
-            System.out.println("har dto error");
         }
-        System.out.println("end");
         return harDtoString;
     }
 }

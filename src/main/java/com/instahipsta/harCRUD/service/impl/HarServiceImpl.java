@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -54,31 +55,31 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public Har createHarFromFile(byte[] content) throws IOException {
-            String version = objectMapper
-                    .readTree(content)
-                    .path("log")
-                    .path("version")
-                    .toString()
-                    .replaceAll("\"", "");
-            String browser = objectMapper
-                    .readTree(content)
-                    .path("log")
-                    .path("browser")
-                    .path("name")
-                    .toString()
-                    .replaceAll("\"", "");
-            String browserVersion = objectMapper
-                    .readTree(content)
-                    .path("log")
-                    .path("browser")
-                    .path("version")
-                    .toString()
-                    .replaceAll("\"", "");
-            JsonNode jsonContent = objectMapper
-                    .readTree(content)
-                    .path("log")
-                    .path("entries");
-            return create(version, browser, browserVersion, jsonContent);
+        String version = objectMapper
+                .readTree(content)
+                .path("log")
+                .path("version")
+                .toString()
+                .replaceAll("\"", "");
+        String browser = objectMapper
+                .readTree(content)
+                .path("log")
+                .path("browser")
+                .path("name")
+                .toString()
+                .replaceAll("\"", "");
+        String browserVersion = objectMapper
+                .readTree(content)
+                .path("log")
+                .path("browser")
+                .path("version")
+                .toString()
+                .replaceAll("\"", "");
+        JsonNode jsonContent = objectMapper
+                .readTree(content)
+                .path("log")
+                .path("entries");
+        return create(version, browser, browserVersion, jsonContent);
     }
 
     @Override
@@ -87,5 +88,21 @@ public class HarServiceImpl implements HarService {
         System.out.println(harExchange + " " + harRoutingKey);
         rabbitTemplate.convertAndSend(harExchange, harRoutingKey, entries);
         System.out.println(2);
+    }
+
+    @Override
+    public void delete(long id) {
+        harRepo.deleteById(id);
+    }
+
+    @Override
+    public Har find(long id) {
+        return harRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public Har update(HarDTO updatedHar) {
+        Har har = mapper.map(updatedHar, Har.class);
+        return harRepo.save(har);
     }
 }
