@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="instahipsta282">
+        <createTable tableName="har">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="browser" type="varchar(255)"/>
+            <column name="browser_version" type="varchar(255)"/>
+            <column name="version" type="varchar(255)"/>
+            <column name="content" type="jsonb">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="instahipsta282">
+        <createTable tableName="test_profile">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="requests_count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="instahipsta282">
+        <createTable tableName="request">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="body" type="text"/>
+            <column name="method" type="integer"/>
+            <column name="perc" type="double precision"/>
+            <column name="url" type="varchar(65000)"/>
+            <column name="test_profile_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="instahipsta282">
+        <addForeignKeyConstraint baseColumnNames="test_profile_id"
+                                 baseTableName="request"
+                                 constraintName="fk_request_test_profile"
+                                 referencedColumnNames="id"
+                                 referencedTableName="test_profile"
+                                 validate="true"/>
+    </changeSet>
+
+    <changeSet id="5" author="instahipsta282">
+        <createTable tableName="test_profile_requests">
+            <column name="test_profile_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requests_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="6" author="instahipsta282">
+        <addForeignKeyConstraint baseColumnNames="test_profile_id"
+                                 baseTableName="test_profile_requests"
+                                 constraintName="fk_test_profile_requests"
+                                 referencedColumnNames="id"
+                                 referencedTableName="test_profile"
+                                 validate="true"/>
+    </changeSet>
+
+    <changeSet id="7" author="instahipsta282">
+        <addForeignKeyConstraint baseColumnNames="requests_id"
+                                 baseTableName="test_profile_requests"
+                                 constraintName="fk_requests_test_profile"
+                                 referencedColumnNames="id"
+                                 referencedTableName="request"
+                                 validate="true"/>
+    </changeSet>
+
+    <changeSet id="8" author="instahipsta282">
+        <createTable tableName="request_headers">
+            <column name="request_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="headers_key" type="varchar(25000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="headers_val" type="varchar(25000)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="9" author="instahipsta282">
+        <addForeignKeyConstraint baseColumnNames="request_id"
+                                 baseTableName="request_headers"
+                                 constraintName="fk_request_headers"
+                                 referencedColumnNames="id"
+                                 referencedTableName="request"
+                                 validate="true"/>
+    </changeSet>
+
+    <changeSet id="10" author="instahipsta282">
+        <createTable tableName="request_params">
+            <column name="request_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="params_key" type="varchar(25000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="params_val" type="varchar(25000)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="11" author="instahipsta282">
+        <addForeignKeyConstraint baseColumnNames="request_id"
+                                 baseTableName="request_params"
+                                 constraintName="fk_request_params"
+                                 referencedColumnNames="id"
+                                 referencedTableName="request"
+                                 validate="true"/>
+    </changeSet>
+
+</databaseChangeLog>
