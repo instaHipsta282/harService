@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.doReturn;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 public class RequestServiceTest {
 
     @InjectMocks
@@ -35,8 +37,8 @@ public class RequestServiceTest {
     private RequestRepo requestRepo;
     @Autowired
     private ObjectMapper objectMapper;
-    @Value("${file.filesForTests}")
-    private String filesForTests;
+//    @Value("${file.filesForTests}")
+    private String filesForTests = "filesForTests";
     private String url;
     private String body;
     private Map<String, String> headers = new HashMap<>();

@@ -5,22 +5,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class TestProfileDtoTest {
-    /*
-        public TestProfileDTO() {}
 
-    public TestProfileDTO(Long id, List<Request> requests, int requestsCount) {
-        this.id = id;
-        this.requests = requests;
-        this.requestsCount = requestsCount;
-    }
-
-     */
     private TestProfileDTO testProfileDTO;
 
     @BeforeEach

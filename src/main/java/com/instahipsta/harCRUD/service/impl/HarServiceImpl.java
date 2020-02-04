@@ -10,23 +10,23 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class HarServiceImpl implements HarService {
-    @NonNull
-    private ObjectMapper objectMapper;
-    @NonNull
-    private HarRepo harRepo;
-    @NonNull
-    private RabbitTemplate rabbitTemplate;
-    @NotNull
-    ModelMapper mapper;
+//    @NonNull
+    private final ObjectMapper objectMapper;
+//    @NonNull
+    private final HarRepo harRepo;
+//    @NonNull
+    private final RabbitTemplate rabbitTemplate;
+//    @NonNull
+    private final ModelMapper mapper;
     @Value("${rabbitmq.harExchange}")
     private String harExchange;
     @Value("${rabbitmq.harRoutingKey}")
@@ -39,7 +39,7 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public HarDTO harToDto(Har har) {
-        return mapper.map(har, HarDTO.class);
+        return this.mapper.map(har, HarDTO.class);
     }
 
     @Override
@@ -82,12 +82,14 @@ public class HarServiceImpl implements HarService {
                     .readTree(content)
                     .path("log")
                     .path("entries");
-            System.out.println("What>");
             return create(version, browser, browserVersion, jsonContent);
     }
 
     @Override
     public void sendHarInQueue(JsonNode entries) {
+        System.out.println(1);
+        System.out.println(harExchange + " " + harRoutingKey);
         rabbitTemplate.convertAndSend(harExchange, harRoutingKey, entries);
+        System.out.println(2);
     }
 }
