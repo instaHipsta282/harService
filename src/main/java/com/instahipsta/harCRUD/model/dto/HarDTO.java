@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class HarDTO implements Transferable {
+public class HarDTO {
 
     private Long id;
     private String version;

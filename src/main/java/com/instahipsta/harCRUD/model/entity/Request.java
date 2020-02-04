@@ -1,6 +1,9 @@
 package com.instahipsta.harCRUD.model.entity;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpMethod;
 
@@ -11,7 +14,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Request implements Entityable {
+public class Request {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "request_id_seq")

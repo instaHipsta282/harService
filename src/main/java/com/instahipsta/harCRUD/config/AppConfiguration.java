@@ -5,8 +5,6 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +34,12 @@ public class AppConfiguration {
 
     @Bean
     public ModelMapper mapper() {
+//
+//        mapper.createTypeMap(Request.class, RequestDTO.class)
+//                .addMappings(m -> m.skip(RequestDTO::setTestProfileId)).setPostConverter(toDtoConverter());
+//        mapper.createTypeMap(RequestDTO.class, Request.class)
+//                .addMappings(m -> m.skip(Request::setTestProfile)).setPostConverter(toEntityConverter());
+
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration()
                 .setMatchingStrategy(STRICT)
