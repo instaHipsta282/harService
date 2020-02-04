@@ -109,7 +109,7 @@ public class HarServiceTest {
 
     @Test
     public void createHarFromFileTest() throws Exception {
-        Har har = harService.createHarFromFile(multipartFile.getBytes());
+        Har har = harService.createHarFromFile(multipartFile);
 
         Assertions.assertEquals("1.2", har.getVersion());
         Assertions.assertEquals("70.0.1", har.getBrowserVersion());
