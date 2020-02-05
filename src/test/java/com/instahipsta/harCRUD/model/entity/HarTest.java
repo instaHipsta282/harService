@@ -16,63 +16,65 @@ public class HarTest {
 
     @Autowired
     private HarService harService;
+
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
+
     private JsonNode content;
     private Har har;
 
     @BeforeEach
-    public void createHar() throws Exception {
-        this.content = objectMapper.readTree("{\n" +
+    void createHar() throws Exception {
+        content = objectMapper.readTree("{\n" +
                 "  \"headers\": {\n" +
                 "    \"name\": \"Last-Modified\",\n" +
                 "    \"value\": \"Sun, 01 Dec 2019 21:32:09 GMT\"\n" +
                 "  }\n" +
                 "}");
 
-        this.har = harService.create("2", "Chrome", "2", content);
+        har = harService.create("2", "Chrome", "2", content);
     }
 
     @Test
-    public void getVersionTest() {
+    void getVersionTest() {
         Assertions.assertEquals("2", har.getVersion());
     }
 
     @Test
-    public void setVersionTest() {
+    void setVersionTest() {
         har.setVersion("3");
         Assertions.assertEquals("3", har.getVersion());
     }
 
     @Test
-    public void getBrowserTest() {
+    void getBrowserTest() {
         Assertions.assertEquals("Chrome", har.getBrowser());
     }
 
     @Test
-    public void setBrowserTest() {
+    void setBrowserTest() {
         har.setBrowser("Jojo");
         Assertions.assertEquals("Jojo", har.getBrowser());
     }
 
     @Test
-    public void getBrowserVersionTest() {
+    void getBrowserVersionTest() {
         Assertions.assertEquals("2", har.getBrowserVersion());
     }
 
     @Test
-    public void setBrowserVersionTest() {
+    void setBrowserVersionTest() {
         har.setBrowserVersion("6");
         Assertions.assertEquals("6", har.getBrowserVersion());
     }
 
     @Test
-    public void getFileNameTest() throws Exception {
+    void getFileNameTest() {
         Assertions.assertEquals(content, har.getContent());
     }
 
     @Test
-    public void setFileNameTest() throws Exception {
+    void setFileNameTest() throws Exception {
         JsonNode newContent = objectMapper.readTree("{\n" +
                 "  \"headers\": {\n" +
                 "    \"name\": \"Fast-Modified\",\n" +

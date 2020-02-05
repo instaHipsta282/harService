@@ -33,12 +33,16 @@ public class RequestServiceTest {
 
     @InjectMocks
     private RequestServiceImpl requestService;
+
     @Mock
     private RequestRepo requestRepo;
+
     @Autowired
     private ObjectMapper objectMapper;
-//    @Value("${file.filesForTests}")
-    private String filesForTests = "filesForTests";
+
+    @Value("${file.filesForTests}")
+    private String filesForTests;
+
     private String url;
     private String body;
     private Map<String, String> headers = new HashMap<>();
@@ -47,7 +51,7 @@ public class RequestServiceTest {
     private TestProfile testProfile = new TestProfile();
 
     @BeforeEach
-    public void initFields() {
+    void initFields() {
         url = "https://yandex.ru";
         body = "{}";
         httpMethod = HttpMethod.GET;
@@ -60,7 +64,7 @@ public class RequestServiceTest {
     }
 
     @Test
-    public void getMapValuesWithArrayTest() throws Exception {
+    void getMapValuesWithArrayTest() throws Exception {
         File file = new File(filesForTests + "/test.json");
         JsonNode node = objectMapper.readTree(file).path("headers");
         Map<String, String> map = requestService.getMapValues(node);
@@ -72,7 +76,7 @@ public class RequestServiceTest {
     }
 
     @Test
-    public void getMapValuesWithoutArrayTest() throws Exception {
+    void getMapValuesWithoutArrayTest() throws Exception {
         File file = new File(filesForTests + "/test3.json");
         JsonNode node = objectMapper.readTree(file).path("headers");
         Map<String, String> map = requestService.getMapValues(node);
@@ -80,7 +84,7 @@ public class RequestServiceTest {
     }
 
     @Test
-    public void createTest() {
+    void createTest() {
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
 
         Assertions.assertEquals("https://yandex.ru", request.getUrl());
@@ -94,7 +98,7 @@ public class RequestServiceTest {
     }
 
     @Test
-    public void saveTest() {
+    void saveTest() {
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
 
         doReturn(request).when(requestRepo).save(request);
@@ -103,7 +107,7 @@ public class RequestServiceTest {
     }
 
     @Test
-    public void entryToRequestTest() throws Exception {
+    void entryToRequestTest() throws Exception {
         File file = new File(filesForTests + "/test2.json");
         JsonNode entry = objectMapper.readTree(file);
         Request request = requestService.entryToRequest(entry, new TestProfile());
@@ -117,7 +121,7 @@ public class RequestServiceTest {
     }
 
     @Test
-    public void jsonNodeToRequestList() throws Exception {
+    void jsonNodeToRequestList() throws Exception {
         File file = new File(filesForTests + "/test_archive.har");
         JsonNode entries = objectMapper.readTree(file)
                 .path("log")
