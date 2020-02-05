@@ -26,65 +26,30 @@ public class HarController {
 
     private final HarService harService;
 
-    @PutMapping("update/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<HarDTO> updateHar(@RequestBody HarDTO har,
                                             @PathVariable long id) {
-
-        Optional<Har> findHar = harService.find(id);
-        if (!findHar.isPresent()) {
-            log.warn("Har with id {} not found", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Har savedHar = harService.update(findHar.get(), har);
-        HarDTO response = harService.harToDto(savedHar);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return harService.update(har, id);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<HarDTO> getHar(@PathVariable long id) {
-
-        Optional<Har> findHar = harService.find(id);
-        if (!findHar.isPresent()) {
-            log.info("Har with id {} not found", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        HarDTO response = harService.harToDto(findHar.get());
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return harService.find(id);
     }
 
 
     @DeleteMapping("{id}")
     public ResponseEntity<HarDTO> deleteHar(@PathVariable long id) {
 
-        Optional<Har> deletedHar = harService.find(id);
-        if (!deletedHar.isPresent()) {
-            log.info("Har wit id {} not found", id);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         harService.delete(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping
-    public ResponseEntity<HarDTO> uploadHar(@RequestParam MultipartFile file,
-                                            UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<HarDTO> uploadHar(@RequestParam MultipartFile file) {
 
-        Har har = harService.createHarFromFile(file);
-        Har savedHar = harService.save(har);
-        if (savedHar == null) {
-            log.warn("Can't save har from file {}", file.getOriginalFilename());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        harService.sendHarInQueue(savedHar.getContent());
-        HarDTO response = harService.harToDto(savedHar);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(uriBuilder.path("/har/{id}").buildAndExpand(response.getId()).toUri());
-
-        return new ResponseEntity<>(response, headers, HttpStatus.CREATED);
+        return harService.add(file);
     }
 }

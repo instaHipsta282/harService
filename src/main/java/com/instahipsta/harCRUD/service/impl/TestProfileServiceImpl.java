@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,23 +20,25 @@ public class TestProfileServiceImpl implements TestProfileService {
 
     @Override
     public TestProfile save(TestProfile testProfile) {
-        int requestsCount = testProfile.getRequests() == null ? 0 : testProfile.getRequests().size();
 
-        testProfile.setRequestsCount(requestsCount);
+        if (testProfile.getRequests() == null) {
+            testProfile.setRequests(new ArrayList<>());
+            testProfile.setRequestsCount(0);
+        }
+
+        testProfile.getRequests().forEach(r -> r.setTestProfile(testProfile));
+
         return testProfileRepo.save(testProfile);
     }
 
     @Override
-    public TestProfile create() {
-        return new TestProfile();
-    }
-
-    @Override
-    public TestProfile create(List<Request> requests) {
+    public TestProfile save(List<Request> requests) {
         TestProfile testProfile = new TestProfile();
-        requests.forEach(r -> r.setTestProfile(testProfile));
+
         testProfile.setRequests(requests);
         testProfile.setRequestsCount(requests.size());
-        return testProfile;
+        testProfile.getRequests().forEach(r -> r.setTestProfile(testProfile));
+
+        return testProfileRepo.save(testProfile);
     }
 }

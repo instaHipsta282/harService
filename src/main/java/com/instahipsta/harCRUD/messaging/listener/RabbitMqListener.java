@@ -23,7 +23,6 @@ public class RabbitMqListener {
     @RabbitListener(queues = "${rabbitmq.harQueue}")
     public void harWorker(JsonNode message) {
         List<Request> requests = requestService.jsonNodeToRequestList(message);
-        TestProfile testProfile = testProfileService.create(requests);
-        testProfileService.save(testProfile);
+        testProfileService.save(requests);
     }
 }

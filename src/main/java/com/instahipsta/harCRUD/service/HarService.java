@@ -3,6 +3,7 @@ package com.instahipsta.harCRUD.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.instahipsta.harCRUD.model.dto.HarDTO;
 import com.instahipsta.harCRUD.model.entity.Har;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,18 +16,15 @@ public interface HarService {
 
     HarDTO harToDto(Har har);
 
-    Har create(String version,
-               String browser,
-               String browserVersion,
-               JsonNode content);
-
     Har createHarFromFile(MultipartFile multipartFile);
 
     void sendHarInQueue(JsonNode entries);
 
-    void delete(long id);
+    ResponseEntity<HarDTO> delete(long id);
 
-    Optional<Har> find(long id);
+    ResponseEntity<HarDTO> find(long id);
 
-    Har update(Har findHar, HarDTO harFromRequest);
+    ResponseEntity<HarDTO> update(HarDTO harFromRequest, long harId);
+
+    ResponseEntity<HarDTO> add(MultipartFile file);
 }
