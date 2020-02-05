@@ -33,10 +33,13 @@ public class TestProfileServiceTest {
 
     @InjectMocks
     private TestProfileServiceImpl testProfileService;
+
     @Mock
     private TestProfileRepo testProfileRepo;
+
     @Autowired
     private RequestService requestService;
+
     private static String url;
     private static String body;
     private static HttpMethod httpMethod;
@@ -44,12 +47,13 @@ public class TestProfileServiceTest {
     private static Map<String, String> params = new HashMap<>();
 
     @BeforeAll
-    public static void initFields() {
+    static void initFields() {
         MockitoAnnotations.initMocks(TestProfileServiceTest.class);
 
         url = "https://yandex.ru";
         body = "{}";
         httpMethod = HttpMethod.GET;
+
         headers.put("header1", "hvalue1");
         headers.put("header2", "hvalue2");
 
@@ -58,7 +62,7 @@ public class TestProfileServiceTest {
     }
 
     @Test
-    public void saveWithRequestsTest() {
+    void saveWithRequestsTest() {
         TestProfile testProfile = testProfileService.create(new ArrayList<>());
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
         testProfile.getRequests().add(request);
@@ -70,7 +74,7 @@ public class TestProfileServiceTest {
     }
 
     @Test
-    public void saveWithoutRequestsTest() {
+    void saveWithoutRequestsTest() {
         TestProfile testProfile = testProfileService.create(new ArrayList<>());
 
         doReturn(testProfile).when(testProfileRepo).save(testProfile);
@@ -80,7 +84,7 @@ public class TestProfileServiceTest {
     }
 
     @Test
-    public void createWithoutArgsTest() {
+    void createWithoutArgsTest() {
         TestProfile testProfile = testProfileService.create();
         Assertions.assertNotNull(testProfile);
         Assertions.assertNull(testProfile.getRequests());
@@ -88,7 +92,7 @@ public class TestProfileServiceTest {
     }
 
     @Test
-    public void createWithArgsTest() {
+    void createWithArgsTest() {
         List<Request> requests = asList(requestService
                 .create(url, body, headers, params, httpMethod, new TestProfile()));
 
@@ -96,6 +100,7 @@ public class TestProfileServiceTest {
 
         Assertions.assertNotNull(testProfile);
         Assertions.assertNotNull(testProfile.getRequests());
+        Assertions.assertEquals(testProfile, testProfile.getRequests().get(0).getTestProfile());
         Assertions.assertEquals(1, testProfile.getRequestsCount());
     }
 }

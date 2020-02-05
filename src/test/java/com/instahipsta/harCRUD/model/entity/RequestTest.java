@@ -21,8 +21,10 @@ public class RequestTest {
 
     @Autowired
     private TestProfileService testProfileService;
+
     @Autowired
     private RequestService requestService;
+
     private String url;
     private String body;
     private Map<String, String> headers = new HashMap<>();
@@ -32,7 +34,7 @@ public class RequestTest {
     private Request request;
 
     @BeforeEach
-    public void initFields() {
+    void initFields() {
         url = "https://yandex.ru";
         body = "{}";
         httpMethod = HttpMethod.GET;
@@ -49,13 +51,13 @@ public class RequestTest {
     }
 
     @Test
-    public void constructorWithoutArguments() {
+    void constructorWithoutArguments() {
         Request request = new Request();
         Assertions.assertNotNull(request);
     }
 
     @Test
-    public void constructorWithArguments() throws Exception {
+    void constructorWithArguments() {
         Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
         Assertions.assertEquals("hvalue1", request.getHeaders().get("header1"));
         Assertions.assertEquals("hvalue2", request.getHeaders().get("header2"));
@@ -68,34 +70,39 @@ public class RequestTest {
     }
 
     @Test
-    public void getUrlTest() throws Exception {
+    void getIdTest() {
+        Assertions.assertEquals(0, request.getId());
+    }
+
+    @Test
+    void getUrlTest() {
         Assertions.assertEquals("https://yandex.ru", request.getUrl());
     }
 
     @Test
-    public void setUrlTest() throws Exception {
+    void setUrlTest() {
         request.setUrl("hohoh");
         Assertions.assertEquals("hohoh", request.getUrl());
     }
 
     @Test
-    public void getBodyTest() throws Exception {
+    void getBodyTest() {
         Assertions.assertEquals("{}", request.getBody());
     }
 
     @Test
-    public void setBodyTest() throws Exception {
+    void setBodyTest() {
         request.setBody("body");
         Assertions.assertEquals("body", request.getBody());
     }
 
     @Test
-    public void getHeadersTest() throws Exception {
+    void getHeadersTest() {
         Assertions.assertEquals(2, request.getHeaders().size());
     }
 
     @Test
-    public void setHeadersTest() throws Exception {
+    void setHeadersTest() {
         Map<String, String> newHeaders = new HashMap<>();
         newHeaders.put("header1k", "header1v");
         newHeaders.put("header2k", "header2v");
@@ -105,12 +112,12 @@ public class RequestTest {
     }
 
     @Test
-    public void getParamsTest() throws Exception {
+    void getParamsTest() {
         Assertions.assertEquals(2, request.getParams().size());
     }
 
     @Test
-    public void setParamsTest() throws Exception {
+    void setParamsTest() {
         Map<String, String> newParams = new HashMap<>();
         newParams.put("param1k", "param1v");
         newParams.put("param2k", "param2v");
@@ -120,34 +127,34 @@ public class RequestTest {
     }
 
     @Test
-    public void getMethodTest() throws Exception {
+    void getMethodTest() {
         Assertions.assertEquals(HttpMethod.GET, request.getMethod());
     }
 
     @Test
-    public void setMethodTest() throws Exception {
+    void setMethodTest() {
         request.setMethod(HttpMethod.DELETE);
         Assertions.assertEquals(HttpMethod.DELETE, request.getMethod());
     }
 
     @Test
-    public void getPercTest() throws Exception {
-        Assertions.assertEquals((Double)0.0, request.getPerc());
+    void getPercTest() {
+        Assertions.assertEquals((Double) 0.0, request.getPerc());
     }
 
     @Test
-    public void setPercTest() throws Exception {
+    void setPercTest() {
         request.setPerc(0.5);
-        Assertions.assertEquals((Double)0.5, request.getPerc());
+        Assertions.assertEquals((Double) 0.5, request.getPerc());
     }
 
     @Test
-    public void getTestProfileTest() throws Exception {
+    void getTestProfileTest() {
         Assertions.assertNotNull(request.getTestProfile());
     }
 
     @Test
-    public void setTestProfileTest() throws Exception {
+    void setTestProfileTest() {
         List<Request> requests = new ArrayList<>();
         requests.add(requestService.create("yandex.ru", body, headers, params, httpMethod, testProfile));
         requests.add(requestService.create("google.com", body, headers, params, httpMethod, testProfile));
