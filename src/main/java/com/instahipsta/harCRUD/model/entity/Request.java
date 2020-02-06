@@ -1,9 +1,8 @@
 package com.instahipsta.harCRUD.model.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpMethod;
 
@@ -11,15 +10,14 @@ import javax.persistence.*;
 import java.util.Map;
 
 @Entity
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class Request {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "request_id_seq")
     @SequenceGenerator(name = "request_id_seq", sequenceName = "request_id_seq", allocationSize = 1)
-    @Setter(AccessLevel.NONE)
     private long id;
     @Length(max = 65000)
     private String url;

@@ -6,67 +6,54 @@ import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.impl.RequestServiceImpl;
+import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.doReturn;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
-@ActiveProfiles("test")
+@AutoConfigureMockMvc
 public class RequestServiceTest {
 
-    @InjectMocks
+    @Autowired
     private RequestServiceImpl requestService;
 
-    @Mock
+    @MockBean
     private RequestRepo requestRepo;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Value("${file.filesForTests}")
-    private String filesForTests;
-
-    private String url;
-    private String body;
-    private Map<String, String> headers = new HashMap<>();
-    private Map<String, String> params = new HashMap<>();
-    private HttpMethod httpMethod;
-    private TestProfile testProfile = new TestProfile();
-
-    @BeforeEach
-    void initFields() {
-        url = "https://yandex.ru";
-        body = "{}";
-        httpMethod = HttpMethod.GET;
-
-        headers.put("header1", "hvalue1");
-        headers.put("header2", "hvalue2");
-
-        params.put("param1", "value1");
-        params.put("param2", "value2");
+    static JsonNode getJsonNodeFromFile(String filename, String[] path) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File("filesForTests/" + filename);
+        JsonNode node = objectMapper.readTree(file);
+        for (String nodeName : path) {
+            node = node.path(nodeName);
+        }
+        return node;
     }
 
-    @Test
-    void getMapValuesWithArrayTest() throws Exception {
-        File file = new File(filesForTests + "/test.json");
-        JsonNode node = objectMapper.readTree(file).path("headers");
+    static Stream<Arguments> getMapValueWithArraySource() throws IOException {
+        return Stream
+                .of(Arguments
+                        .of(getJsonNodeFromFile("test.json", new String[]{"headers"})));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getMapValueWithArraySource")
+    void getMapValuesWithArrayTest(JsonNode node) {
         Map<String, String> map = requestService.getMapValues(node);
 
         Assertions.assertEquals(3, map.size());
@@ -75,42 +62,48 @@ public class RequestServiceTest {
         Assertions.assertEquals("Mon, 02 Dec 2019 13:59:15 GMT", map.get("Date"));
     }
 
-    @Test
-    void getMapValuesWithoutArrayTest() throws Exception {
-        File file = new File(filesForTests + "/test3.json");
-        JsonNode node = objectMapper.readTree(file).path("headers");
+    static Stream<Arguments> getMapValueWithoutArraySource() throws IOException {
+        return Stream
+                .of(Arguments
+                        .of(getJsonNodeFromFile("test3.json", new String[]{"headers"})));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getMapValueWithoutArraySource")
+    void getMapValuesWithoutArrayTest(JsonNode node) {
         Map<String, String> map = requestService.getMapValues(node);
         Assertions.assertEquals("Sun, 01 Dec 2019 21:32:09 GMT", map.get("Last-Modified"));
     }
 
-    @Test
-    void createTest() {
-        Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
+    static Stream<Arguments> saveSource() {
+        String url = "https://yandex.ru";
+        String body = "{}";
+        HttpMethod httpMethod = HttpMethod.GET;
+        Map<String, String> headers = Maps.newHashMap("header1", "hvalue1");
+        Map<String, String> params = Maps.newHashMap("param1", "value1");
+        TestProfile testProfile = new TestProfile();
 
-        Assertions.assertEquals("https://yandex.ru", request.getUrl());
-        Assertions.assertEquals("{}", request.getBody());
-        Assertions.assertEquals(HttpMethod.GET, request.getMethod());
-        Assertions.assertEquals(testProfile, request.getTestProfile());
-        Assertions.assertEquals("hvalue2", request.getHeaders().get("header2"));
-        Assertions.assertEquals("hvalue1", request.getHeaders().get("header1"));
-        Assertions.assertEquals("value2", request.getParams().get("param2"));
-        Assertions.assertEquals("value1", request.getParams().get("param1"));
+        return Stream.of(
+                Arguments.of(new Request(0, url, body, headers, params, httpMethod, 0.0, testProfile)));
     }
 
-    @Test
-    void saveTest() {
-        Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
-
+    @ParameterizedTest
+    @MethodSource("saveSource")
+    void saveTest(Request request) {
         doReturn(request).when(requestRepo).save(request);
         Request savedRequest = requestService.save(request);
         Assertions.assertEquals(savedRequest, request);
     }
 
-    @Test
-    void entryToRequestTest() throws Exception {
-        File file = new File(filesForTests + "/test2.json");
-        JsonNode entry = objectMapper.readTree(file);
-        Request request = requestService.entryToRequest(entry, new TestProfile());
+    static Stream<Arguments> entryToRequestSource() throws IOException {
+        return Stream.of(Arguments.of(getJsonNodeFromFile("test2.json", new String[]{})));
+    }
+
+    @ParameterizedTest
+    @MethodSource("entryToRequestSource")
+    void entryToRequestTest(JsonNode node) {
+        Request request = requestService.entryToRequest(node, new TestProfile());
+
         Assertions.assertNotNull(request.getTestProfile());
         Assertions.assertEquals("https://e.mail.ru/api/v1/utils/xray/batch", request.getUrl());
         Assertions.assertEquals(HttpMethod.POST, request.getMethod());
@@ -120,13 +113,17 @@ public class RequestServiceTest {
         Assertions.assertEquals("boddy", request.getBody());
     }
 
-    @Test
-    void jsonNodeToRequestList() throws Exception {
-        File file = new File(filesForTests + "/test_archive.har");
-        JsonNode entries = objectMapper.readTree(file)
-                .path("log")
-                .path("entries");
-        List<Request> requests = requestService.jsonNodeToRequestList(entries);
+    static Stream<Arguments> jsonNodeToRequestListSource() throws IOException {
+        return Stream
+                .of(Arguments
+                        .of(getJsonNodeFromFile("test_archive.har", new String[]{"log", "entries"})));
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("jsonNodeToRequestListSource")
+    void jsonNodeToRequestListTest(JsonNode node) {
+        List<Request> requests = requestService.jsonNodeToRequestList(node);
         Request request = requests.get(0);
 
         Assertions.assertEquals(1, requests.size());

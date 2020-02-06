@@ -13,6 +13,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,20 +43,6 @@ public class HarServiceImpl implements HarService {
     @Override
     public HarDTO harToDto(Har har) {
         return this.mapper.map(har, HarDTO.class);
-    }
-
-    @Override
-    public Har create(String version,
-                      String browser,
-                      String browserVersion,
-                      JsonNode content) {
-
-        Har har = new Har();
-        har.setVersion(version);
-        har.setBrowser(browser);
-        har.setBrowserVersion(browserVersion);
-        har.setContent(content);
-        return har;
     }
 
     @Override
@@ -90,7 +78,7 @@ public class HarServiceImpl implements HarService {
                     .readTree(content)
                     .path("log")
                     .path("entries");
-            return create(version, browser, browserVersion, jsonContent);
+            return new Har(0, version, browser, browserVersion, jsonContent);
         }
         catch (IOException e) {
             log.error("Wrong file {}", multipartFile.getOriginalFilename());
@@ -100,27 +88,69 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public void sendHarInQueue(JsonNode entries) {
-        System.out.println(1);
-        System.out.println(harExchange + " " + harRoutingKey);
         rabbitTemplate.convertAndSend(harExchange, harRoutingKey, entries);
-        System.out.println(2);
     }
 
     @Override
-    public void delete(long id) {
-        harRepo.deleteById(id);
+    public ResponseEntity<HarDTO> delete(long id) {
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        Optional<Har> deletedHar = harRepo.findById(id);
+
+        if (!deletedHar.isPresent()) log.info("Har wit id {} not found", id);
+        else {
+            harRepo.deleteById(id);
+            httpStatus = HttpStatus.OK;
+        }
+
+        return new ResponseEntity<>(httpStatus);
     }
 
     @Override
-    public Optional<Har> find(long id) {
-        return harRepo.findById(id);
+    public ResponseEntity<HarDTO> find(long id) {
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        HarDTO response = null;
+        Optional<Har> findHar = harRepo.findById(id);
+
+        if (!findHar.isPresent()) log.info("Har wit id {} not found", id);
+        else  {
+            httpStatus = HttpStatus.OK;
+            response = harToDto(findHar.get());
+        }
+
+        return new ResponseEntity<>(response, httpStatus);
     }
 
     @Override
-    public Har update(Har updatedHar, HarDTO harFromRequest) {
-        updatedHar.setVersion(harFromRequest.getVersion());
-        updatedHar.setBrowserVersion(harFromRequest.getBrowserVersion());
-        updatedHar.setBrowser(harFromRequest.getBrowser());
-        return harRepo.save(updatedHar);
+    public ResponseEntity<HarDTO> update(HarDTO harFromRequest, long harId) {
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        HarDTO response = null;
+        Optional<Har> findHar = harRepo.findById(harId);
+
+        if (!findHar.isPresent()) log.warn("Har with id {} not found", harId);
+        else {
+            Har updatedHar = findHar.get();
+
+            updatedHar.setVersion(harFromRequest.getVersion());
+            updatedHar.setBrowserVersion(harFromRequest.getBrowserVersion());
+            updatedHar.setBrowser(harFromRequest.getBrowser());
+
+            Har savedHar = harRepo.save(updatedHar);
+            response = harToDto(savedHar);
+            httpStatus = HttpStatus.OK;
+        }
+
+        return new ResponseEntity<>(response, httpStatus);
+    }
+
+    @Override
+    public ResponseEntity<HarDTO> add(MultipartFile file) {
+        Har har = createHarFromFile(file);
+        Har savedHar = harRepo.save(har);
+
+        sendHarInQueue(savedHar.getContent());
+
+        HarDTO response = harToDto(savedHar);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

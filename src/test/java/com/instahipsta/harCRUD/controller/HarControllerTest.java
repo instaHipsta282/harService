@@ -1,118 +1,127 @@
-//package com.instahipsta.harCRUD.controller;
-//
-//import com.fasterxml.jackson.databind.JsonNode;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.instahipsta.harCRUD.HarServiceApplication;
-//import com.instahipsta.harCRUD.model.dto.HarDTO;
-//import com.instahipsta.harCRUD.model.entity.Har;
-//import com.instahipsta.harCRUD.service.HarService;
-//import com.instahipsta.harCRUD.service.TestProfileServiceTest;
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.MockitoAnnotations;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.http.MediaType;
-//import org.springframework.mock.web.MockMultipartFile;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//import org.springframework.test.web.servlet.MockMvc;
-//
-//import java.io.IOException;
-//import java.nio.file.Files;
-//import java.nio.file.Path;
-//import java.nio.file.Paths;
-//
-//import static org.mockito.Mockito.doReturn;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-//import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//
-//@WebMvcTest(HarController.class)
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = HarServiceApplication.class)
-//public class HarControllerTest {
-//
-//    @Autowired
-//    private MockMvc mockMvc;
-//    @Autowired
-//    private ObjectMapper objectMapper;
-//    @MockBean
-//    private HarService harService;
-//    private MockMultipartFile multipartFile;
-//    private MockMultipartFile multipartFileEmptyOriginalFilename;
-//    private MockMultipartFile multipartFileWithoutHarVersion;
-//    @Value("${file.filesForTests}")
-//    private String filesForTests;
-//    private JsonNode content;
-//
-//
-//    @BeforeEach
-//    public void createMultipartFile() throws Exception {
-//        MockitoAnnotations.initMocks(TestProfileServiceTest.class);
-////
-////        ReflectionTestUtils.setField(harService, "harExchange",
-////                harExchange);
-////        ReflectionTestUtils.setField(harService, "harRoutingKey",
-////                harRoutingKey);
-//
-//        content = objectMapper.readTree("{\n" +
-//                "  \"headers\": {\n" +
-//                "    \"name\": \"Last-Modified\",\n" +
-//                "    \"value\": \"Sun, 01 Dec 2019 21:32:09 GMT\"\n" +
-//                "  }\n" +
-//                "}");
-//
-//
-//        Path path = Paths.get(filesForTests + "/test_archive.har");
-//
-//        String name = "file";
-//        String originalFileName = "test_archive.har";
-//        String contentType = "application/json";
-//        byte[] content = null;
-//
-//        Path pathWithoutHarVersion = Paths.get(filesForTests + "/test_archive_without_har_version.har");
-//        byte[] contentWithoutHarVersion = null;
-//
-//        try {
-//            content = Files.readAllBytes(path);
-//            contentWithoutHarVersion = Files.readAllBytes(pathWithoutHarVersion);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        this.multipartFile = new MockMultipartFile(name, originalFileName, contentType, content);
-//        this.multipartFileEmptyOriginalFilename = new MockMultipartFile(name, "", contentType, content);
-//        this.multipartFileWithoutHarVersion
-//                = new MockMultipartFile(name, originalFileName, contentType, contentWithoutHarVersion);
-//    }
-//
-//    @Test
-//    public void uploadHarTest() throws Exception {
-//        Har har = harService.create("1", "Mozilla", "12", content);
-//        doReturn(har).when(harService).createHarFromFile(content.toString().getBytes());
-//        doReturn(har).when(harService).save(har);
-//
-//        this.mockMvc.perform(multipart("/har/upload")
-//                .file(multipartFile)
-//                .contentType(MediaType.MULTIPART_FORM_DATA))
-//                .andExpect(status().is2xxSuccessful())
-//                .andDo(print());
-////        Assertions.assertTrue(isOk);
-//    }
-//
-//    @Test
-//    public void uploadHarSecondIfNegativeTest() throws Exception {
-//        boolean isOk = this.mockMvc.perform(multipart("/har/upload")
-//                .file(multipartFileWithoutHarVersion)
-//                .contentType(MediaType.MULTIPART_FORM_DATA))
-//                .andReturn()
-//                .getResponse()
-//                .getContentAsString()
-//                .contains("null");
-//        Assertions.assertTrue(isOk);
-//    }
-//}
+package com.instahipsta.harCRUD.controller;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.model.entity.Har;
+import com.instahipsta.harCRUD.repository.HarRepo;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.AdditionalAnswers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+public class HarControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private HarRepo harRepo;
+
+    static Har getHar() {
+        return new Har(1, "1.0.1", "Explorer", "1.0.0", null);
+    }
+
+    static Stream<Arguments> updateSource() throws JsonProcessingException {
+        HarDTO harDTO = new HarDTO(5L, "1.2", "Firefox", "70.0.1");
+        return Stream.of(
+                Arguments.of(new ObjectMapper().writeValueAsString(harDTO), getHar(), 1L));
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateSource")
+    void updateTest(String harDto, Har har, long id) throws Exception {
+        when(harRepo.findById(id)).thenReturn(Optional.of(har));
+        when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
+
+        mockMvc.perform(put("/har/" + id)
+                .content(harDto)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content()
+                        .json("{\"id\":1," +
+                                "\"version\":\"1.2\"," +
+                                "\"browser\":\"Firefox\"," +
+                                "\"browserVersion\":\"70.0.1\"}"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = 1)
+    void getTest(long id) throws Exception {
+        when(harRepo.findById(id)).thenReturn(Optional.of(getHar()));
+
+        mockMvc.perform(get("/har/" + id))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content()
+                        .json("{\"id\":1," +
+                                "\"version\":\"1.0.1\"," +
+                                "\"browser\":\"Explorer\"," +
+                                "\"browserVersion\":\"1.0.0\"}"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = 1)
+    void deleteTest(long id) throws Exception {
+        when(harRepo.findById(id)).thenReturn(Optional.of(getHar()));
+
+        mockMvc.perform(delete("/har/" + id))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    static Stream<Arguments> addSource() throws IOException {
+        String name = "file";
+        String contentType = "application/json";
+        String originalFileName = "test_archive.har";
+        Path path = Paths.get("filesForTests/test_archive.har");
+        byte[] content = Files.readAllBytes(path);
+
+        MultipartFile multipartFile = new MockMultipartFile(name, originalFileName, contentType, content);
+
+        return Stream.of(Arguments.of(multipartFile));
+    }
+
+    @ParameterizedTest
+    @MethodSource("addSource")
+    void addTest(MockMultipartFile file) throws Exception {
+        when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
+
+        mockMvc.perform(multipart("/har")
+                .file(file)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content()
+                        .json("{\"id\":0," +
+                                "\"version\":\"1.2\"," +
+                                "\"browser\":\"Firefox\"," +
+                                "\"browserVersion\":\"70.0.1\"}"));
+    }
+}

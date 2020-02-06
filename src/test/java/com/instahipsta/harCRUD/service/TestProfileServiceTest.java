@@ -4,103 +4,90 @@ import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import com.instahipsta.harCRUD.service.impl.TestProfileServiceImpl;
+import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.AdditionalAnswers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
-import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
-@ActiveProfiles("test")
+@AutoConfigureMockMvc
 public class TestProfileServiceTest {
 
-    @InjectMocks
+    @Autowired
     private TestProfileServiceImpl testProfileService;
 
-    @Mock
+    @MockBean
     private TestProfileRepo testProfileRepo;
 
-    @Autowired
-    private RequestService requestService;
+    static List<Request> getListOfRequests() {
+        String url = "https://yandex.ru";
+        String body = "{}";
+        HttpMethod httpMethod = HttpMethod.GET;
+        Map<String, String> headers = Maps.newHashMap("header1", "hvalue1");
+        Map<String, String> params = Maps.newHashMap("param1", "value1");
+        TestProfile testProfile = new TestProfile();
 
-    private static String url;
-    private static String body;
-    private static HttpMethod httpMethod;
-    private static Map<String, String> headers = new HashMap<>();
-    private static Map<String, String> params = new HashMap<>();
+        return asList(new Request(1L, url, body, headers, params, httpMethod, 0.0, testProfile));
+    }
 
-    @BeforeAll
-    static void initFields() {
-        MockitoAnnotations.initMocks(TestProfileServiceTest.class);
+    static Stream<Arguments> saveSource() {
+        TestProfile testProfile = new TestProfile();
+        testProfile.setRequests(getListOfRequests());
 
-        url = "https://yandex.ru";
-        body = "{}";
-        httpMethod = HttpMethod.GET;
+        return Stream.of(Arguments.of(testProfile));
+    }
 
-        headers.put("header1", "hvalue1");
-        headers.put("header2", "hvalue2");
+    @ParameterizedTest
+    @MethodSource("saveSource")
+    void saveTest(TestProfile testProfile) {
 
-        params.put("param1", "value1");
-        params.put("param2", "value2");
+        when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
+
+        TestProfile savedTestProfile = testProfileService.save(testProfile);
+        Assertions.assertEquals(testProfile.getRequests().size(), savedTestProfile.getRequestsCount());
+        Assertions.assertEquals(testProfile.getRequests(), savedTestProfile.getRequests());
+        Assertions.assertEquals(testProfile.getId(), savedTestProfile.getId());
+    }
+
+    static Stream<Arguments> saveWithoutRequestsSource() {
+        return Stream.of(Arguments.of(new TestProfile()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("saveWithoutRequestsSource")
+    void saveWithoutRequestsTest(TestProfile testProfile) {
+        when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
+
+
+        TestProfile savedTestProfile = testProfileService.save(testProfile);
+        Assertions.assertEquals(0, savedTestProfile.getRequestsCount());
+        Assertions.assertNotNull(savedTestProfile.getRequests());
     }
 
     @Test
     void saveWithRequestsTest() {
-        TestProfile testProfile = testProfileService.create(new ArrayList<>());
-        Request request = requestService.create(url, body, headers, params, httpMethod, testProfile);
-        testProfile.getRequests().add(request);
+        List<Request> requests = getListOfRequests();
+        when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
-        doReturn(testProfile).when(testProfileRepo).save(testProfile);
+        TestProfile savedTestProfile = testProfileService.save(requests);
 
-        TestProfile savedTestProfile = testProfileService.save(testProfile);
-        assertThat(testProfile).isEqualTo(savedTestProfile);
-    }
-
-    @Test
-    void saveWithoutRequestsTest() {
-        TestProfile testProfile = testProfileService.create(new ArrayList<>());
-
-        doReturn(testProfile).when(testProfileRepo).save(testProfile);
-
-        TestProfile savedTestProfile = testProfileService.save(testProfile);
-        assertThat(testProfile).isEqualTo(savedTestProfile);
-    }
-
-    @Test
-    void createWithoutArgsTest() {
-        TestProfile testProfile = testProfileService.create();
-        Assertions.assertNotNull(testProfile);
-        Assertions.assertNull(testProfile.getRequests());
-        Assertions.assertEquals(0, testProfile.getRequestsCount());
-    }
-
-    @Test
-    void createWithArgsTest() {
-        List<Request> requests = asList(requestService
-                .create(url, body, headers, params, httpMethod, new TestProfile()));
-
-        TestProfile testProfile = testProfileService.create(requests);
-
-        Assertions.assertNotNull(testProfile);
-        Assertions.assertNotNull(testProfile.getRequests());
-        Assertions.assertEquals(testProfile, testProfile.getRequests().get(0).getTestProfile());
-        Assertions.assertEquals(1, testProfile.getRequestsCount());
+        Assertions.assertEquals(requests.size(), savedTestProfile.getRequestsCount());
+        Assertions.assertEquals(requests, savedTestProfile.getRequests());
     }
 }

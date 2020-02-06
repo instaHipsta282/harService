@@ -2,61 +2,38 @@ package com.instahipsta.harCRUD.messaging.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.entity.TestProfile;
-import com.instahipsta.harCRUD.service.TestProfileService;
-import com.instahipsta.harCRUD.service.TestProfileServiceTest;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
-
-import static org.mockito.Mockito.doThrow;
+import java.io.IOException;
+import java.util.stream.Stream;
 
 @SpringBootTest
-@ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
+@AutoConfigureMockMvc
 public class RabbitMqListenerTest {
 
-    @Value("${file.filesForTests}")
-    private String filesForTests;
     @Autowired
-    @InjectMocks
     private RabbitMqListener rabbitMqListener;
-    @Mock
-    private TestProfileService testProfileService;
-    @Autowired
-    private ObjectMapper objectMapper;
 
-    @BeforeEach
-    public void initFields() throws Exception {
-        MockitoAnnotations.initMocks(TestProfileServiceTest.class);
-    }
-
-    @Test
-    public void harWorker() throws Exception {
-        File file = new File(filesForTests + "/test_archive.har");
+    static Stream<Arguments> harWorkerSource() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File( "filesForTests/test_archive.har");
         JsonNode node = objectMapper.readTree(file)
                 .path("log")
                 .path("entries");
-        TestProfile testProfile = new TestProfile();
 
-        doThrow(new RuntimeException()).when(testProfileService).save(testProfile);
-
-        Assertions.assertThrows(RuntimeException.class, () -> rabbitMqListener.harWorker(node));
+        return Stream.of(Arguments.of(node));
     }
 
-
+    @ParameterizedTest
+    @MethodSource("harWorkerSource")
+    void harWorkerTest(JsonNode node) {
+        Assertions.assertDoesNotThrow(() -> rabbitMqListener.harWorker(node));
+    }
 }

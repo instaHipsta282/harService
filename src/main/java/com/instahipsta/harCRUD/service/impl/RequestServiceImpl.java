@@ -34,26 +34,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Request create(String url,
-                          String body,
-                          Map<String, String> headers,
-                          Map<String, String> params,
-                          HttpMethod method,
-                          TestProfile testProfile) {
-
-        Request request = new Request();
-        request.setUrl(url);
-        request.setBody(body);
-        request.setHeaders(headers);
-        request.setParams(params);
-        request.setMethod(method);
-        request.setPerc(0.0);
-        request.setTestProfile(testProfile);
-
-        return request;
-    }
-
-    @Override
     public Request save(Request request) {
         return requestRepo.save(request);
     }
@@ -69,7 +49,7 @@ public class RequestServiceImpl implements RequestService {
         HttpMethod method = HttpMethod.valueOf(request.path("method").asText());
         Map<String, String> headers = getMapValues(request.path("headers"));
         Map<String, String> params = getMapValues(request.path("queryString"));
-        return create(url, body, headers, params, method, testProfile);
+        return new Request(0, url, body, headers, params, method, 0.0, testProfile);
     }
 
     @Override
