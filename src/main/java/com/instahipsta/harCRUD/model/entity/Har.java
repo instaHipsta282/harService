@@ -21,10 +21,13 @@ public class Har {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "har_id_seq")
     @SequenceGenerator(name = "har_id_seq", sequenceName = "har_id_seq", allocationSize = 1)
     private long id;
+
     @Column(nullable = false)
     private String version;
+
     private String browser;
     private String browserVersion;
+
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     private JsonNode content;

@@ -2,7 +2,7 @@ package com.instahipsta.harCRUD.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.model.dto.HarDto;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,7 +48,7 @@ public class HarControllerTest {
     }
 
     static Stream<Arguments> updateSource() throws JsonProcessingException {
-        HarDTO harDTO = new HarDTO(5L, "1.2", "Firefox", "70.0.1");
+        HarDto harDTO = new HarDto(5L, "1.2", "Firefox", "70.0.1");
         return Stream.of(
                 Arguments.of(new ObjectMapper().writeValueAsString(harDTO), getHar(), 1L));
     }

@@ -2,17 +2,16 @@ package com.instahipsta.harCRUD.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.model.dto.HarDto;
 import com.instahipsta.harCRUD.model.entity.Har;
+import com.instahipsta.harCRUD.property.RabbitmqProperties;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.HarService;
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,10 +29,11 @@ public class HarServiceImpl implements HarService {
     private final HarRepo harRepo;
     private final RabbitTemplate rabbitTemplate;
     private final ModelMapper mapper;
-    @Value("${rabbitmq.harExchange}")
-    private String harExchange;
-    @Value("${rabbitmq.harRoutingKey}")
-    private String harRoutingKey;
+    private final RabbitmqProperties rabbitmqProperties;
+    //    @Value("${rabbitmq.harExchange}")
+//    private String harExchange;
+//    @Value("${rabbitmq.harRoutingKey}")
+//    private String harRoutingKey;
 
     @Override
     public Har save(Har har) {
@@ -41,8 +41,8 @@ public class HarServiceImpl implements HarService {
     }
 
     @Override
-    public HarDTO harToDto(Har har) {
-        return this.mapper.map(har, HarDTO.class);
+    public HarDto harToDto(Har har) {
+        return this.mapper.map(har, HarDto.class);
     }
 
     @Override
@@ -79,8 +79,7 @@ public class HarServiceImpl implements HarService {
                     .path("log")
                     .path("entries");
             return new Har(0, version, browser, browserVersion, jsonContent);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("Wrong file {}", multipartFile.getOriginalFilename());
             throw new IllegalArgumentException("In file " + multipartFile.getOriginalFilename());
         }
@@ -88,11 +87,13 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public void sendHarInQueue(JsonNode entries) {
-        rabbitTemplate.convertAndSend(harExchange, harRoutingKey, entries);
+        rabbitTemplate.convertAndSend(rabbitmqProperties.getHarExchange(),
+                rabbitmqProperties.getHarRoutingKey(),
+                entries);
     }
 
     @Override
-    public ResponseEntity<HarDTO> delete(long id) {
+    public ResponseEntity<HarDto> delete(long id) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         Optional<Har> deletedHar = harRepo.findById(id);
 
@@ -106,13 +107,13 @@ public class HarServiceImpl implements HarService {
     }
 
     @Override
-    public ResponseEntity<HarDTO> find(long id) {
+    public ResponseEntity<HarDto> find(long id) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-        HarDTO response = null;
+        HarDto response = null;
         Optional<Har> findHar = harRepo.findById(id);
 
         if (!findHar.isPresent()) log.info("Har wit id {} not found", id);
-        else  {
+        else {
             httpStatus = HttpStatus.OK;
             response = harToDto(findHar.get());
         }
@@ -121,9 +122,9 @@ public class HarServiceImpl implements HarService {
     }
 
     @Override
-    public ResponseEntity<HarDTO> update(HarDTO harFromRequest, long harId) {
+    public ResponseEntity<HarDto> update(HarDto harFromRequest, long harId) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-        HarDTO response = null;
+        HarDto response = null;
         Optional<Har> findHar = harRepo.findById(harId);
 
         if (!findHar.isPresent()) log.warn("Har with id {} not found", harId);
@@ -143,13 +144,13 @@ public class HarServiceImpl implements HarService {
     }
 
     @Override
-    public ResponseEntity<HarDTO> add(MultipartFile file) {
+    public ResponseEntity<HarDto> add(MultipartFile file) {
         Har har = createHarFromFile(file);
         Har savedHar = harRepo.save(har);
 
         sendHarInQueue(savedHar.getContent());
 
-        HarDTO response = harToDto(savedHar);
+        HarDto response = harToDto(savedHar);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

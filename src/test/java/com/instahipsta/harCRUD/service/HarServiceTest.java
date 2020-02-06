@@ -3,7 +3,7 @@ package com.instahipsta.harCRUD.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.dto.HarDTO;
+import com.instahipsta.harCRUD.model.dto.HarDto;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.impl.HarServiceImpl;
@@ -82,7 +82,7 @@ public class HarServiceTest {
     @ParameterizedTest
     @MethodSource("saveSource")
     void harToDtoTest(Har har) {
-        HarDTO harDTO = harService.harToDto(har);
+        HarDto harDTO = harService.harToDto(har);
 
         Assertions.assertEquals("Firefox", harDTO.getBrowser());
         Assertions.assertEquals("1", harDTO.getBrowserVersion());
@@ -122,8 +122,8 @@ public class HarServiceTest {
     void findTest(Har har) {
         when(harRepo.findById(98L)).thenReturn(Optional.of(har));
 
-        ResponseEntity<HarDTO> responseEntity = harService.find(98L);
-        HarDTO findHar = responseEntity.getBody();
+        ResponseEntity<HarDto> responseEntity = harService.find(98L);
+        HarDto findHar = responseEntity.getBody();
 
         Assertions.assertEquals(har.getVersion(), findHar.getVersion());
         Assertions.assertEquals(har.getBrowser(), findHar.getBrowser());
@@ -135,7 +135,7 @@ public class HarServiceTest {
     @ValueSource(longs = 98L)
     void findNegativeTest(long id) {
         when(harRepo.findById(98L)).thenReturn(Optional.empty());
-        ResponseEntity<HarDTO> responseEntity = harService.find(id);
+        ResponseEntity<HarDto> responseEntity = harService.find(id);
 
         Assertions.assertNull(responseEntity.getBody());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -143,19 +143,19 @@ public class HarServiceTest {
 
 
     static Stream<Arguments> updateSource() throws JsonProcessingException {
-        HarDTO harDTO = new HarDTO(0L, "999", "Chrome", "110");
+        HarDto harDTO = new HarDto(0L, "999", "Chrome", "110");
         Har har = new Har(0L, "1", "Firefox", "1", getContent());
         return Stream.of(Arguments.of(harDTO, har, 1L));
     }
 
     @ParameterizedTest
     @MethodSource("updateSource")
-    void updateTest(HarDTO harDTO, Har har, long id) {
+    void updateTest(HarDto harDTO, Har har, long id) {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
         when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
-        ResponseEntity<HarDTO> responseEntity = harService.update(harDTO, id);
-        HarDTO response = responseEntity.getBody();
+        ResponseEntity<HarDto> responseEntity = harService.update(harDTO, id);
+        HarDto response = responseEntity.getBody();
 
         Assertions.assertEquals(har.getVersion(), response.getVersion());
         Assertions.assertEquals(har.getBrowser(), response.getBrowser());
@@ -164,16 +164,16 @@ public class HarServiceTest {
     }
 
     static Stream<Arguments> updateNegativeSource() {
-        HarDTO harDTO = new HarDTO(0L, "999", "Chrome", "110");
+        HarDto harDTO = new HarDto(0L, "999", "Chrome", "110");
         return Stream.of(Arguments.of(harDTO, 1L));
     }
 
     @ParameterizedTest
     @MethodSource("updateNegativeSource")
-    void updateNegativeTest(HarDTO harDTO, long id) {
+    void updateNegativeTest(HarDto harDTO, long id) {
         when(harRepo.findById(id)).thenReturn(Optional.empty());
 
-        ResponseEntity<HarDTO> responseEntity = harService.update(harDTO, id);
+        ResponseEntity<HarDto> responseEntity = harService.update(harDTO, id);
 
         Assertions.assertNull(responseEntity.getBody());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());

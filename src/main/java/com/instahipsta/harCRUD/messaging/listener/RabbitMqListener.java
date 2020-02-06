@@ -2,7 +2,6 @@ package com.instahipsta.harCRUD.messaging.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.instahipsta.harCRUD.model.entity.Request;
-import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
 import lombok.AllArgsConstructor;
