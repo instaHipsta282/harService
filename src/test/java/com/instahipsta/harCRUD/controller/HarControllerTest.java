@@ -8,7 +8,8 @@ import com.instahipsta.harCRUD.repository.HarRepo;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.AdditionalAnswers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -42,63 +43,60 @@ public class HarControllerTest {
     @MockBean
     private HarRepo harRepo;
 
-    @MockBean
-    private RabbitTemplate rabbitTemplate;
+    static Har getHar() {
+        return new Har(1, "1.0.1", "Explorer", "1.0.0", null);
+    }
 
-    static Stream<Arguments> updateTestSource() throws JsonProcessingException {
+    static Stream<Arguments> updateSource() throws JsonProcessingException {
         HarDTO harDTO = new HarDTO(5L, "1.2", "Firefox", "70.0.1");
-        Har har = new Har(1, "1.0.1", "Explorer", "1.0.0.", null);
         return Stream.of(
-                Arguments.of(new ObjectMapper().writeValueAsString(harDTO), har));
+                Arguments.of(new ObjectMapper().writeValueAsString(harDTO), getHar(), 1L));
     }
 
     @ParameterizedTest
-    @MethodSource("updateTestSource")
-    void updateTest(String harDto, Har har) throws Exception {
+    @MethodSource("updateSource")
+    void updateTest(String harDto, Har har, long id) throws Exception {
+        when(harRepo.findById(id)).thenReturn(Optional.of(har));
+        when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
-        doReturn(Optional.of(har)).when(harRepo).findById(1L);
-        doReturn(har).when(harRepo).save(har);
-
-        mockMvc.perform(put("/har/1")
+        mockMvc.perform(put("/har/" + id)
                 .content(harDto)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content()
-                        .json("{\"id\":1,\"version\":\"1.2\",\"browser\":\"Firefox\",\"browserVersion\":\"70.0.1\"}"));
-    }
-
-
-    static Stream<Arguments> getTestSource() {
-        Har har = new Har(1, "1.0.1", "Explorer", "1.0.0", null);
-        return Stream.of(Arguments.of(har, 1L));
+                        .json("{\"id\":1," +
+                                "\"version\":\"1.2\"," +
+                                "\"browser\":\"Firefox\"," +
+                                "\"browserVersion\":\"70.0.1\"}"));
     }
 
     @ParameterizedTest
-    @MethodSource("getTestSource")
-    void getTest(Har har, long id) throws Exception {
+    @ValueSource(longs = 1)
+    void getTest(long id) throws Exception {
+        when(harRepo.findById(id)).thenReturn(Optional.of(getHar()));
 
-        doReturn(Optional.of(har)).when(harRepo).findById(id);
-
-        mockMvc.perform(get("/har/1"))
+        mockMvc.perform(get("/har/" + id))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content()
-                        .json("{\"id\":1,\"version\":\"1.0.1\",\"browser\":\"Explorer\",\"browserVersion\":\"1.0.0\"}"));
+                        .json("{\"id\":1," +
+                                "\"version\":\"1.0.1\"," +
+                                "\"browser\":\"Explorer\"," +
+                                "\"browserVersion\":\"1.0.0\"}"));
     }
 
     @ParameterizedTest
-    @MethodSource("getTestSource")
-    void deleteTest(Har har, long id) throws Exception {
+    @ValueSource(longs = 1)
+    void deleteTest(long id) throws Exception {
+        when(harRepo.findById(id)).thenReturn(Optional.of(getHar()));
 
-        doReturn(Optional.of(har)).when(harRepo).findById(id);
-
-        mockMvc.perform(delete("/har/1"))
+        mockMvc.perform(delete("/har/" + id))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
     }
 
-    static Stream<Arguments> addTestSource() throws IOException {
+    static Stream<Arguments> addSource() throws IOException {
         String name = "file";
         String contentType = "application/json";
         String originalFileName = "test_archive.har";
@@ -107,16 +105,13 @@ public class HarControllerTest {
 
         MultipartFile multipartFile = new MockMultipartFile(name, originalFileName, contentType, content);
 
-        Har har = new Har(1, "1.0.1", "Explorer", "1.0.0", null);
-
-        return Stream.of(Arguments.of(har, multipartFile));
+        return Stream.of(Arguments.of(multipartFile));
     }
 
     @ParameterizedTest
-    @MethodSource("addTestSource")
-    void addTest(Har har, MockMultipartFile file) throws Exception {
-
-        doReturn(har).when(harRepo).save(any(Har.class));
+    @MethodSource("addSource")
+    void addTest(MockMultipartFile file) throws Exception {
+        when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
         mockMvc.perform(multipart("/har")
                 .file(file)
@@ -124,6 +119,9 @@ public class HarControllerTest {
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content()
-                        .json("{\"id\":1,\"version\":\"1.0.1\",\"browser\":\"Explorer\",\"browserVersion\":\"1.0.0\"}"));
+                        .json("{\"id\":0," +
+                                "\"version\":\"1.2\"," +
+                                "\"browser\":\"Firefox\"," +
+                                "\"browserVersion\":\"70.0.1\"}"));
     }
 }

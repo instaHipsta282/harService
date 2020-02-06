@@ -35,13 +35,20 @@ public class RequestServiceTest {
     @MockBean
     private RequestRepo requestRepo;
 
-    static Stream<Arguments> getMapValueWithArraySource() throws IOException {
+    static JsonNode getJsonNodeFromFile(String filename, String[] path) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+        File file = new File("filesForTests/" + filename);
+        JsonNode node = objectMapper.readTree(file);
+        for (String nodeName : path) {
+            node = node.path(nodeName);
+        }
+        return node;
+    }
 
-        File file = new File( "filesForTests/test.json");
-        JsonNode node = objectMapper.readTree(file).path("headers");
-
-        return Stream.of(Arguments.of(node));
+    static Stream<Arguments> getMapValueWithArraySource() throws IOException {
+        return Stream
+                .of(Arguments
+                        .of(getJsonNodeFromFile("test.json", new String[]{"headers"})));
     }
 
     @ParameterizedTest
@@ -56,17 +63,14 @@ public class RequestServiceTest {
     }
 
     static Stream<Arguments> getMapValueWithoutArraySource() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        File file = new File( "filesForTests/test3.json");
-        JsonNode node = objectMapper.readTree(file).path("headers");
-
-        return Stream.of(Arguments.of(node));
+        return Stream
+                .of(Arguments
+                        .of(getJsonNodeFromFile("test3.json", new String[]{"headers"})));
     }
 
     @ParameterizedTest
     @MethodSource("getMapValueWithoutArraySource")
-    void getMapValuesWithoutArrayTest(JsonNode node) throws Exception {
+    void getMapValuesWithoutArrayTest(JsonNode node) {
         Map<String, String> map = requestService.getMapValues(node);
         Assertions.assertEquals("Sun, 01 Dec 2019 21:32:09 GMT", map.get("Last-Modified"));
     }
@@ -92,12 +96,7 @@ public class RequestServiceTest {
     }
 
     static Stream<Arguments> entryToRequestSource() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        File file = new File( "filesForTests/test2.json");
-        JsonNode node = objectMapper.readTree(file);
-
-        return Stream.of(Arguments.of(node));
+        return Stream.of(Arguments.of(getJsonNodeFromFile("test2.json", new String[]{})));
     }
 
     @ParameterizedTest
@@ -115,14 +114,9 @@ public class RequestServiceTest {
     }
 
     static Stream<Arguments> jsonNodeToRequestListSource() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        File file = new File( "filesForTests/test_archive.har");
-        JsonNode node = objectMapper.readTree(file)
-                .path("log")
-                .path("entries");
-
-        return Stream.of(Arguments.of(node));
+        return Stream
+                .of(Arguments
+                        .of(getJsonNodeFromFile("test_archive.har", new String[]{"log", "entries"})));
     }
 
 

@@ -6,22 +6,24 @@ import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import com.instahipsta.harCRUD.service.impl.TestProfileServiceImpl;
 import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.AdditionalAnswers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,7 +35,7 @@ public class TestProfileServiceTest {
     @MockBean
     private TestProfileRepo testProfileRepo;
 
-    static Stream<Arguments> testSaveSource() {
+    static List<Request> getListOfRequests() {
         String url = "https://yandex.ru";
         String body = "{}";
         HttpMethod httpMethod = HttpMethod.GET;
@@ -41,17 +43,21 @@ public class TestProfileServiceTest {
         Map<String, String> params = Maps.newHashMap("param1", "value1");
         TestProfile testProfile = new TestProfile();
 
-        Request request = new Request(1L, url, body, headers, params, httpMethod, 0.0, testProfile);
-        testProfile.setRequests(Collections.singletonList(request));
+        return asList(new Request(1L, url, body, headers, params, httpMethod, 0.0, testProfile));
+    }
+
+    static Stream<Arguments> saveSource() {
+        TestProfile testProfile = new TestProfile();
+        testProfile.setRequests(getListOfRequests());
 
         return Stream.of(Arguments.of(testProfile));
     }
 
     @ParameterizedTest
-    @MethodSource("testSaveSource")
+    @MethodSource("saveSource")
     void saveTest(TestProfile testProfile) {
 
-        doReturn(testProfile).when(testProfileRepo).save(testProfile);
+        when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
         TestProfile savedTestProfile = testProfileService.save(testProfile);
         Assertions.assertEquals(testProfile.getRequests().size(), savedTestProfile.getRequestsCount());
@@ -59,40 +65,25 @@ public class TestProfileServiceTest {
         Assertions.assertEquals(testProfile.getId(), savedTestProfile.getId());
     }
 
-    static Stream<Arguments> testSaveWithoutRequestsSource() {
+    static Stream<Arguments> saveWithoutRequestsSource() {
         return Stream.of(Arguments.of(new TestProfile()));
     }
 
     @ParameterizedTest
-    @MethodSource("testSaveWithoutRequestsSource")
+    @MethodSource("saveWithoutRequestsSource")
     void saveWithoutRequestsTest(TestProfile testProfile) {
-        doReturn(testProfile).when(testProfileRepo).save(testProfile);
+        when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
+
 
         TestProfile savedTestProfile = testProfileService.save(testProfile);
-
         Assertions.assertEquals(0, savedTestProfile.getRequestsCount());
         Assertions.assertNotNull(savedTestProfile.getRequests());
     }
 
-    static Stream<Arguments> testSaveWithRequestsSource() {
-        String url = "https://yandex.ru";
-        String body = "{}";
-        HttpMethod httpMethod = HttpMethod.GET;
-        Map<String, String> headers = Maps.newHashMap("header1", "hvalue1");
-        Map<String, String> params = Maps.newHashMap("param1", "value1");
-        TestProfile testProfile = new TestProfile();
-
-        Request request = new Request(1L, url, body, headers, params, httpMethod, 0.0, testProfile);
-
-        testProfile.setRequestsCount(1);
-        testProfile.setRequests(asList(request));
-        return Stream.of(Arguments.of(asList(request), testProfile));
-    }
-
-    @ParameterizedTest
-    @MethodSource("testSaveWithRequestsSource")
-    void saveWithRequestsTest(List<Request> requests, TestProfile testProfile) {
-        doReturn(testProfile).when(testProfileRepo).save(testProfile);
+    @Test
+    void saveWithRequestsTest() {
+        List<Request> requests = getListOfRequests();
+        when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
         TestProfile savedTestProfile = testProfileService.save(requests);
 

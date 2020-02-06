@@ -8,16 +8,13 @@ import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.repository.HarRepo;
 import com.instahipsta.harCRUD.service.impl.HarServiceImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.AdditionalAnswers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,7 +30,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -46,49 +43,6 @@ public class HarServiceTest {
     @MockBean
     private HarRepo harRepo;
 
-    @Spy
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Value("${file.filesForTests}")
-    private String filesForTests;
-
-    private MockMultipartFile multipartFile;
-    private MockMultipartFile wrongMultipartFile;
-    private JsonNode content;
-    private Har har;
-//
-//    @BeforeEach
-//    void initFields() throws Exception {
-//        MockitoAnnotations.initMocks(TestProfileServiceTest.class);
-//        content = objectMapper.readTree("{\n" +
-//                "  \"headers\": {\n" +
-//                "    \"name\": \"Last-Modified\",\n" +
-//                "    \"value\": \"Sun, 01 Dec 2019 21:32:09 GMT\"\n" +
-//                "  }\n" +
-//                "}");
-//
-//        har = harService.create("1", "Firefox", "1", content);
-//
-//        Path path = Paths.get(filesForTests + "/test_archive.har");
-//        Path wrongPath = Paths.get(filesForTests + "/oyo50.jpg");
-//
-//        String name = "file";
-//        String originalFileName = "test_archive.har";
-//        String contentType = "application/json";
-//        byte[] fileContent = null;
-//        byte[] wrongContent = null;
-//
-//        try {
-//            fileContent = Files.readAllBytes(path);
-//            wrongContent = Files.readAllBytes(wrongPath);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        multipartFile = new MockMultipartFile(name, originalFileName, contentType, fileContent);
-//        wrongMultipartFile = new MockMultipartFile(name, originalFileName, contentType, wrongContent);
-//    }
-
     static MultipartFile uploadFile(String filename) throws IOException {
 
         Path wrongPath = Paths.get("filesForTests/" + filename);
@@ -100,23 +54,25 @@ public class HarServiceTest {
         return new MockMultipartFile(name, originalFileName, contentType, wrongFileContent);
     }
 
-    static Stream<Arguments> saveSource() throws JsonProcessingException {
+    static JsonNode getContent() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode content = objectMapper.readTree("{\n" +
+        return objectMapper.readTree("{\n" +
                 "  \"headers\": {\n" +
                 "    \"name\": \"Last-Modified\",\n" +
                 "    \"value\": \"Sun, 01 Dec 2019 21:32:09 GMT\"\n" +
                 "  }\n" +
                 "}");
+    }
 
-        Har har = new Har(0L, "1", "Firefox", "1", content);
+    static Stream<Arguments> saveSource() throws JsonProcessingException {
+        Har har = new Har(0L, "1", "Firefox", "1", getContent());
         return Stream.of(Arguments.of(har));
     }
 
     @ParameterizedTest
     @MethodSource("saveSource")
     void saveTest(Har har) {
-        doReturn(har).when(harRepo).save(har);
+        when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
         Har savedHar = harService.save(har);
 
@@ -125,24 +81,18 @@ public class HarServiceTest {
 
     @ParameterizedTest
     @MethodSource("saveSource")
-    void harToDto(Har har) {
-
+    void harToDtoTest(Har har) {
         HarDTO harDTO = harService.harToDto(har);
+
         Assertions.assertEquals("Firefox", harDTO.getBrowser());
         Assertions.assertEquals("1", harDTO.getBrowserVersion());
         Assertions.assertEquals("1", harDTO.getVersion());
         Assertions.assertEquals(0, harDTO.getId());
     }
 
-    static Stream<Arguments> createHarFromFileSource() throws IOException {
-        return Stream.of(Arguments.of(uploadFile("test_archive.har")));
-    }
-
-
-    @ParameterizedTest
-    @MethodSource("createHarFromFileSource")
-    void createHarFromFileTest(MultipartFile file) {
-        Har har = harService.createHarFromFile(file);
+    @Test
+    void createHarFromFileTest() throws IOException {
+        Har har = harService.createHarFromFile(uploadFile("test_archive.har"));
 
         Assertions.assertEquals("1.2", har.getVersion());
         Assertions.assertEquals("70.0.1", har.getBrowserVersion());
@@ -150,32 +100,15 @@ public class HarServiceTest {
         Assertions.assertNotNull(har.getContent());
     }
 
-    static Stream<Arguments> createHarFromFileCatchSource() throws IOException {
-        return Stream.of(Arguments.of(uploadFile("oyo50.jpg")));
-    }
-
-    @ParameterizedTest
-    @MethodSource("createHarFromFileCatchSource")
-    void createHarFromFileCatchTest(MultipartFile wrongMultipartFile) {
+    @Test
+    void createHarFromFileCatchTest() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                harService.createHarFromFile(wrongMultipartFile));
+                harService.createHarFromFile(uploadFile("oyo50.jpg")));
     }
 
-    static Stream<Arguments> sendHarInQueueSource() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode content = objectMapper.readTree("{\n" +
-                "  \"headers\": {\n" +
-                "    \"name\": \"Last-Modified\",\n" +
-                "    \"value\": \"Sun, 01 Dec 2019 21:32:09 GMT\"\n" +
-                "  }\n" +
-                "}");
-        return Stream.of(Arguments.of(content));
-    }
-
-    @ParameterizedTest
-    @MethodSource("sendHarInQueueSource")
-    void sendHarInQueueTest(JsonNode node) {
-        Assertions.assertDoesNotThrow(() -> harService.sendHarInQueue(node));
+    @Test
+    void sendHarInQueueTest() {
+        Assertions.assertDoesNotThrow(() -> harService.sendHarInQueue(getContent()));
     }
 
     @ParameterizedTest
@@ -187,9 +120,9 @@ public class HarServiceTest {
     @ParameterizedTest
     @MethodSource("saveSource")
     void findTest(Har har) {
-        doReturn(Optional.of(har)).when(harRepo).findById(98L);
-        ResponseEntity<HarDTO> responseEntity = harService.find(98L);
+        when(harRepo.findById(98L)).thenReturn(Optional.of(har));
 
+        ResponseEntity<HarDTO> responseEntity = harService.find(98L);
         HarDTO findHar = responseEntity.getBody();
 
         Assertions.assertEquals(har.getVersion(), findHar.getVersion());
@@ -197,19 +130,52 @@ public class HarServiceTest {
         Assertions.assertEquals(har.getBrowserVersion(), findHar.getBrowserVersion());
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
-//
-//    @Test
-//    void updateTest() {
-//        HarDTO harDTO = new HarDTO(0L, "999", "Chrome", "110");
-//        Har newHar = harService.create("999", "Chrome", "110", content);
-//
-//        doReturn(newHar).when(harRepo).save(har);
-//
-//        Har savedHar = harService.update(har, harDTO);
-//
-//        Assertions.assertEquals("999", savedHar.getVersion());
-//        Assertions.assertEquals("Chrome", savedHar.getBrowser());
-//        Assertions.assertEquals("110", savedHar.getBrowserVersion());
-//        Assertions.assertEquals(content, savedHar.getContent());
-//    }
+
+    @ParameterizedTest
+    @ValueSource(longs = 98L)
+    void findNegativeTest(long id) {
+        when(harRepo.findById(98L)).thenReturn(Optional.empty());
+        ResponseEntity<HarDTO> responseEntity = harService.find(id);
+
+        Assertions.assertNull(responseEntity.getBody());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
+
+
+    static Stream<Arguments> updateSource() throws JsonProcessingException {
+        HarDTO harDTO = new HarDTO(0L, "999", "Chrome", "110");
+        Har har = new Har(0L, "1", "Firefox", "1", getContent());
+        return Stream.of(Arguments.of(harDTO, har, 1L));
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateSource")
+    void updateTest(HarDTO harDTO, Har har, long id) {
+        when(harRepo.findById(id)).thenReturn(Optional.of(har));
+        when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
+
+        ResponseEntity<HarDTO> responseEntity = harService.update(harDTO, id);
+        HarDTO response = responseEntity.getBody();
+
+        Assertions.assertEquals(har.getVersion(), response.getVersion());
+        Assertions.assertEquals(har.getBrowser(), response.getBrowser());
+        Assertions.assertEquals(har.getBrowserVersion(), response.getBrowserVersion());
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+
+    static Stream<Arguments> updateNegativeSource() {
+        HarDTO harDTO = new HarDTO(0L, "999", "Chrome", "110");
+        return Stream.of(Arguments.of(harDTO, 1L));
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateNegativeSource")
+    void updateNegativeTest(HarDTO harDTO, long id) {
+        when(harRepo.findById(id)).thenReturn(Optional.empty());
+
+        ResponseEntity<HarDTO> responseEntity = harService.update(harDTO, id);
+
+        Assertions.assertNull(responseEntity.getBody());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
 }

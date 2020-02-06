@@ -21,11 +21,9 @@ public class TestProfileServiceImpl implements TestProfileService {
     @Override
     public TestProfile save(TestProfile testProfile) {
 
-        if (testProfile.getRequests() == null) {
-            testProfile.setRequests(new ArrayList<>());
-            testProfile.setRequestsCount(0);
-        }
+        if (testProfile.getRequests() == null) testProfile.setRequests(new ArrayList<>());
 
+        testProfile.setRequestsCount(testProfile.getRequests().size());
         testProfile.getRequests().forEach(r -> r.setTestProfile(testProfile));
 
         return testProfileRepo.save(testProfile);

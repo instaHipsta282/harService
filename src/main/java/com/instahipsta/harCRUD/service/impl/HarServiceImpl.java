@@ -88,21 +88,15 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public void sendHarInQueue(JsonNode entries) {
-        System.out.println(1);
-        System.out.println(harExchange + " " + harRoutingKey);
         rabbitTemplate.convertAndSend(harExchange, harRoutingKey, entries);
-        System.out.println(2);
     }
 
     @Override
     public ResponseEntity<HarDTO> delete(long id) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-
         Optional<Har> deletedHar = harRepo.findById(id);
 
-        if (!deletedHar.isPresent()) {
-            log.info("Har wit id {} not found", id);
-        }
+        if (!deletedHar.isPresent()) log.info("Har wit id {} not found", id);
         else {
             harRepo.deleteById(id);
             httpStatus = HttpStatus.OK;
@@ -113,12 +107,12 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public ResponseEntity<HarDTO> find(long id) {
-
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         HarDTO response = null;
-
         Optional<Har> findHar = harRepo.findById(id);
-        if (findHar.isPresent()) {
+
+        if (!findHar.isPresent()) log.info("Har wit id {} not found", id);
+        else  {
             httpStatus = HttpStatus.OK;
             response = harToDto(findHar.get());
         }
@@ -128,16 +122,11 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public ResponseEntity<HarDTO> update(HarDTO harFromRequest, long harId) {
-
-        HttpStatus httpStatus;
-        HarDTO response;
-
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        HarDTO response = null;
         Optional<Har> findHar = harRepo.findById(harId);
-        if (!findHar.isPresent()) {
-            log.warn("Har with id {} not found", harId);
-            response = null;
-            httpStatus = HttpStatus.NOT_FOUND;
-        }
+
+        if (!findHar.isPresent()) log.warn("Har with id {} not found", harId);
         else {
             Har updatedHar = findHar.get();
 
@@ -156,12 +145,8 @@ public class HarServiceImpl implements HarService {
     @Override
     public ResponseEntity<HarDTO> add(MultipartFile file) {
         Har har = createHarFromFile(file);
-        System.out.println(har.getBrowser() + " " + har.getBrowserVersion());
         Har savedHar = harRepo.save(har);
 
-        System.out.println(savedHar == null);
-
-        System.out.println(savedHar.getContent() == null);
         sendHarInQueue(savedHar.getContent());
 
         HarDTO response = harToDto(savedHar);
