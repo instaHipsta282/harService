@@ -7,7 +7,7 @@ spring:
   jpa:
     database: POSTGRESQL
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/har_service_test
@@ -32,7 +32,8 @@ spring:
           stateless: true
   liquibase:
     enabled: true
-    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
+    change-log: classpath*:db.changelog/changelog.yml
+
 file:
   downloads: test_downloads
   filesForTests: filesForTests

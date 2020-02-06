@@ -35,7 +35,7 @@ spring:
 
   liquibase:
     enabled: true
-    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
+    change-log: classpath*:db.changelog/changelog.yml
 
 management:
   endpoints:
@@ -83,55 +83,10 @@ spring:
 
   liquibase:
     enabled: true
-    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
+    change-log: classpath*:db.changelog/changelog.yml
 
 file:
   downloads: ./downloads
-
-rabbitmq:
-  harQueue: harQueue
-  deadletterQueue: deadletterQueue
-  harExchange: harExchange
-  deadletterExchange: deadletterExchange
-  harRoutingKey: har
-  deadletterRoutingKey: deadletterRoutingKey
-
----
-
-spring:
-  profiles: test
-  jpa:
-    database: POSTGRESQL
-    hibernate:
-      ddl-auto: create
-  datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/har_service_test
-    password: root
-    username: root
-  servlet:
-    multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
-  rabbitmq:
-    host: 127.0.0.1
-    username: root
-    password: root
-    listener:
-      simple:
-        retry:
-          enabled: true
-          initial-interval: 1000
-          max-attempts: 3
-          max-interval: 10000
-          multiplier: 2.0
-          stateless: true
-  liquibase:
-    enabled: true
-    change-log: classpath*:db.changelog/db.changelog-master-dev.yaml
-file:
-  downloads: test_downloads
-  filesForTests: filesForTests
 
 rabbitmq:
   harQueue: harQueue
