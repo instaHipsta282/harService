@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.property;
+package com.instahipsta.harCRUD.config.property;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

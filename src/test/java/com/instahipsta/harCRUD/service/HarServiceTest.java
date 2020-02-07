@@ -1,8 +1,7 @@
 package com.instahipsta.harCRUD.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.model.dto.HarDto;
 import com.instahipsta.harCRUD.model.entity.Har;
 import com.instahipsta.harCRUD.repository.HarRepo;
@@ -10,10 +9,10 @@ import com.instahipsta.harCRUD.service.impl.HarServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -43,6 +41,9 @@ public class HarServiceTest {
     @MockBean
     private HarRepo harRepo;
 
+    @MockBean
+    private RabbitTemplate rabbitTemplate;
+
     static MultipartFile uploadFile(String filename) throws IOException {
 
         Path wrongPath = Paths.get("filesForTests/" + filename);
@@ -54,40 +55,29 @@ public class HarServiceTest {
         return new MockMultipartFile(name, originalFileName, contentType, wrongFileContent);
     }
 
-    static JsonNode getContent() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readTree("{\n" +
-                "  \"headers\": {\n" +
-                "    \"name\": \"Last-Modified\",\n" +
-                "    \"value\": \"Sun, 01 Dec 2019 21:32:09 GMT\"\n" +
-                "  }\n" +
-                "}");
-    }
-
-    static Stream<Arguments> saveSource() throws JsonProcessingException {
-        Har har = new Har(0L, "1", "Firefox", "1", getContent());
-        return Stream.of(Arguments.of(har));
-    }
-
     @ParameterizedTest
-    @MethodSource("saveSource")
+    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harSource")
     void saveTest(Har har) {
         when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
-        Har savedHar = harService.save(har);
+        HarDto savedHar = harService.save(har);
 
-        Assertions.assertEquals(har, savedHar);
+        Assertions.assertEquals(har.getVersion(), savedHar.getVersion());
+        Assertions.assertEquals(har.getBrowser(), savedHar.getBrowser());
+        Assertions.assertEquals(har.getBrowserVersion(), savedHar.getBrowserVersion());
+        Assertions.assertEquals(har.getContent(), savedHar.getContent());
+        Assertions.assertEquals(har.getId(), savedHar.getId());
     }
 
     @ParameterizedTest
-    @MethodSource("saveSource")
+    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harSource")
     void harToDtoTest(Har har) {
         HarDto harDTO = harService.harToDto(har);
 
-        Assertions.assertEquals("Firefox", harDTO.getBrowser());
-        Assertions.assertEquals("1", harDTO.getBrowserVersion());
-        Assertions.assertEquals("1", harDTO.getVersion());
-        Assertions.assertEquals(0, harDTO.getId());
+        Assertions.assertEquals("Explorer", harDTO.getBrowser());
+        Assertions.assertEquals("1.0.0", harDTO.getBrowserVersion());
+        Assertions.assertEquals("1.0.1", harDTO.getVersion());
+        Assertions.assertEquals(1, harDTO.getId());
     }
 
     @Test
@@ -102,13 +92,14 @@ public class HarServiceTest {
 
     @Test
     void createHarFromFileCatchTest() {
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                harService.createHarFromFile(uploadFile("oyo50.jpg")));
+        Assertions.assertThrows(NullPointerException.class, () ->
+                harService.createHarFromFile(uploadFile("test2.json")));
     }
 
-    @Test
-    void sendHarInQueueTest() {
-        Assertions.assertDoesNotThrow(() -> harService.sendHarInQueue(getContent()));
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#contentSource")
+    void sendHarInQueueTest(JsonNode content) {
+        Assertions.assertDoesNotThrow(() -> harService.sendHarInQueue(content));
     }
 
     @ParameterizedTest
@@ -118,11 +109,11 @@ public class HarServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("saveSource")
-    void findTest(Har har) {
-        when(harRepo.findById(98L)).thenReturn(Optional.of(har));
+    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harAndIdSource")
+    void findTest(Har har, long id) {
+        when(harRepo.findById(id)).thenReturn(Optional.of(har));
 
-        ResponseEntity<HarDto> responseEntity = harService.find(98L);
+        ResponseEntity<HarDto> responseEntity = harService.find(id);
         HarDto findHar = responseEntity.getBody();
 
         Assertions.assertEquals(har.getVersion(), findHar.getVersion());
@@ -134,22 +125,12 @@ public class HarServiceTest {
     @ParameterizedTest
     @ValueSource(longs = 98L)
     void findNegativeTest(long id) {
-        when(harRepo.findById(98L)).thenReturn(Optional.empty());
-        ResponseEntity<HarDto> responseEntity = harService.find(id);
-
-        Assertions.assertNull(responseEntity.getBody());
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-    }
-
-
-    static Stream<Arguments> updateSource() throws JsonProcessingException {
-        HarDto harDTO = new HarDto(0L, "999", "Chrome", "110");
-        Har har = new Har(0L, "1", "Firefox", "1", getContent());
-        return Stream.of(Arguments.of(harDTO, har, 1L));
+        when(harRepo.findById(id)).thenReturn(Optional.empty());
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> harService.find(id));
     }
 
     @ParameterizedTest
-    @MethodSource("updateSource")
+    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harDtoHarAndIdSource")
     void updateTest(HarDto harDTO, Har har, long id) {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
         when(harRepo.save(any(Har.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
@@ -163,19 +144,12 @@ public class HarServiceTest {
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
-    static Stream<Arguments> updateNegativeSource() {
-        HarDto harDTO = new HarDto(0L, "999", "Chrome", "110");
-        return Stream.of(Arguments.of(harDTO, 1L));
-    }
-
     @ParameterizedTest
-    @MethodSource("updateNegativeSource")
+    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harDtoAndIdSource")
     void updateNegativeTest(HarDto harDTO, long id) {
         when(harRepo.findById(id)).thenReturn(Optional.empty());
 
-        ResponseEntity<HarDto> responseEntity = harService.update(harDTO, id);
-
-        Assertions.assertNull(responseEntity.getBody());
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                harService.update(harDTO, id));
     }
 }

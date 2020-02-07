@@ -2,14 +2,12 @@ package com.instahipsta.harCRUD.model.dto;
 
 import com.instahipsta.harCRUD.model.entity.Request;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestProfileDto {

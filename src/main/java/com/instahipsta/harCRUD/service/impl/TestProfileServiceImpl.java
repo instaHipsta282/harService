@@ -4,7 +4,6 @@ import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import com.instahipsta.harCRUD.service.TestProfileService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +12,14 @@ import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class TestProfileServiceImpl implements TestProfileService {
 
     private TestProfileRepo testProfileRepo;
+
+    public TestProfileServiceImpl(TestProfileRepo testProfileRepo) {
+        this.testProfileRepo = testProfileRepo;
+    }
+
 
     @Override
     public TestProfile save(TestProfile testProfile) {

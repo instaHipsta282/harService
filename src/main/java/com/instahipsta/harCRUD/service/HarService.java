@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public interface HarService {
-    Har save(Har har);
+    HarDto save(Har har);
 
     HarDto harToDto(Har har);
 
@@ -17,7 +17,7 @@ public interface HarService {
 
     void sendHarInQueue(JsonNode entries);
 
-    ResponseEntity<HarDto> delete(long id);
+    void delete(long id);
 
     ResponseEntity<HarDto> find(long id);
 

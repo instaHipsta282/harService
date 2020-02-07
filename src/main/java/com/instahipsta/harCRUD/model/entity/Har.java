@@ -5,6 +5,7 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -23,13 +24,18 @@ public class Har {
     private long id;
 
     @Column(nullable = false)
+    @NonNull
     private String version;
 
+    @NonNull
     private String browser;
+
+    @NonNull
     private String browserVersion;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
+    @NonNull
     private JsonNode content;
 
 }

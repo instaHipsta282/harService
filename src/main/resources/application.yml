@@ -46,8 +46,13 @@ management:
     info:
       enabled: true
 
-file:
-  downloads: ./downloads
+rabbitmq:
+  harQueue: harQueue
+  deadletterQueue: deadletterQueue
+  harExchange: harExchange
+  deadletterExchange: dead-letter-exchange
+  harRoutingKey: har
+  deadletterRoutingKey: deadletterRoutingKey
 
 ---
 
@@ -85,13 +90,10 @@ spring:
     enabled: true
     change-log: classpath*:db.changelog/changelog.yml
 
-file:
-  downloads: ./downloads
-
 rabbitmq:
   harQueue: harQueue
   deadletterQueue: deadletterQueue
   harExchange: harExchange
-  deadletterExchange: deadletterExchange
+  deadletterExchange: dead-letter-exchange
   harRoutingKey: har
   deadletterRoutingKey: deadletterRoutingKey

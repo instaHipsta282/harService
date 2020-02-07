@@ -5,7 +5,6 @@ import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.RequestService;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +14,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@AllArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
     private RequestRepo requestRepo;
+
+    public RequestServiceImpl(RequestRepo requestRepo) {
+        this.requestRepo = requestRepo;
+    }
 
     @Override
     public Map<String, String> getMapValues(JsonNode mapValues) {

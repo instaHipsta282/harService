@@ -7,12 +7,12 @@ spring:
   jpa:
     database: POSTGRESQL
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/har_service_test
-    password: root
-    username: root
+    password: test
+    username: test
   servlet:
     multipart:
       max-file-size: 50MB
@@ -34,14 +34,10 @@ spring:
     enabled: true
     change-log: classpath*:db.changelog/changelog.yml
 
-file:
-  downloads: test_downloads
-  filesForTests: filesForTests
-
 rabbitmq:
   harQueue: harQueue
   deadletterQueue: deadletterQueue
   harExchange: harExchange
-  deadletterExchange: deadletterExchange
+  deadletterExchange: dead-letter-exchange
   harRoutingKey: har
   deadletterRoutingKey: deadletterRoutingKey

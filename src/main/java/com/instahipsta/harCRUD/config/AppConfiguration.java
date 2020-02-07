@@ -1,7 +1,6 @@
 package com.instahipsta.harCRUD.config;
 
-import com.instahipsta.harCRUD.property.RabbitmqProperties;
-import lombok.AllArgsConstructor;
+import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.DirectExchange;
@@ -18,10 +17,13 @@ import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
 @Configuration
 @EnableRabbit
-@AllArgsConstructor
 public class AppConfiguration {
 
-    RabbitmqProperties rabbitmqProperties;
+    private RabbitmqProperties rabbitmqProperties;
+
+    public AppConfiguration(RabbitmqProperties rabbitmqProperties) {
+        this.rabbitmqProperties = rabbitmqProperties;
+    }
 
     @Bean
     public ModelMapper mapper() {

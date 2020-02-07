@@ -1,2 +1,3 @@
 CREATE DATABASE har_service;
-CREATE DATABASE har_service_test;
+CREATE ROLE test WITH LOGIN PASSWORD 'test';
+CREATE DATABASE har_service_test WITH OWNER test;
