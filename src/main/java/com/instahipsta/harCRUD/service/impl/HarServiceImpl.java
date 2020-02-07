@@ -64,8 +64,9 @@ public class HarServiceImpl implements HarService {
             String browser = objectMapper.readTree(content).at("/log/browser/name").textValue();
             String browserVersion = objectMapper.readTree(content).at("/log/browser/version").textValue();
             JsonNode jsonContent = objectMapper.readTree(content).at("/log/entries");
-            Har har2 = new Har();
+
             return new Har(0, version, browser, browserVersion, jsonContent);
+
         } catch (IOException e) {
             log.error("Wrong file {}", multipartFile.getOriginalFilename());
             throw new IllegalArgumentException("In file " + multipartFile.getOriginalFilename());
@@ -75,8 +76,8 @@ public class HarServiceImpl implements HarService {
     @Override
     public void sendHarInQueue(JsonNode entries) {
         rabbitTemplate.convertAndSend(rabbitmqProperties.getHarExchange(),
-                rabbitmqProperties.getHarRoutingKey(),
-                entries);
+                                      rabbitmqProperties.getHarRoutingKey(),
+                                      entries);
     }
 
     @Override
@@ -101,7 +102,7 @@ public class HarServiceImpl implements HarService {
         har.setBrowser(harFromRequest.getBrowser());
 
         return new ResponseEntity<>(save(har), HttpStatus.OK);
-}
+    }
 
     @Override
     public ResponseEntity<HarDto> add(MultipartFile file) {

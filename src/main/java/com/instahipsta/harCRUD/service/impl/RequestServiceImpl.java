@@ -44,13 +44,13 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Request entryToRequest(JsonNode entry,
                                   TestProfile testProfile) {
-        JsonNode request = entry.path("request");
 
-        String url = request.path("url").asText();
-        String body = request.path("postData").path("text").asText();
-        HttpMethod method = HttpMethod.valueOf(request.path("method").asText());
-        Map<String, String> headers = getMapValues(request.path("headers"));
-        Map<String, String> params = getMapValues(request.path("queryString"));
+        String url = entry.at("/request/url").asText();
+        String body = entry.at("/request/postData/text").asText();
+        HttpMethod method = HttpMethod.valueOf(entry.at("/request/method").asText());
+        Map<String, String> headers = getMapValues(entry.at("/request/headers"));
+        Map<String, String> params = getMapValues(entry.at("/request/queryString"));
+
         return new Request(0, url, body, headers, params, method, 0.0, testProfile);
     }
 

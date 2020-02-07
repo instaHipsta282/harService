@@ -37,7 +37,7 @@ services:
       - harService
   backend:
     container_name: har_backend
-    image: instahipsta/har_service:0.10
+    image: instahipsta/har_service:1.0
     restart: always
     ports:
     - 8080:8080
