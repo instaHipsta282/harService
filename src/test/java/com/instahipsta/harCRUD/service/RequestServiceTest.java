@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class RequestDtoServiceTest {
+public class RequestServiceTest {
 
     @Autowired
     private RequestServiceImpl requestService;

@@ -48,7 +48,7 @@
 
     <changeSet id="4" author="instahipsta282">
         <addForeignKeyConstraint baseColumnNames="test_profile_id"
-                                 baseTableName="requestDto"
+                                 baseTableName="request"
                                  constraintName="fk_request_test_profile"
                                  referencedColumnNames="id"
                                  referencedTableName="test_profile"
@@ -80,7 +80,7 @@
                                  baseTableName="test_profile_requests"
                                  constraintName="fk_requests_test_profile"
                                  referencedColumnNames="id"
-                                 referencedTableName="requestDto"
+                                 referencedTableName="request"
                                  validate="true"/>
     </changeSet>
 
