@@ -18,7 +18,7 @@ public class TestProfile {
     @SequenceGenerator(name = "test_profile_id_seq", sequenceName = "test_profile_id_seq", allocationSize = 1)
     private long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Request> requests;
 
     private int requestsCount;

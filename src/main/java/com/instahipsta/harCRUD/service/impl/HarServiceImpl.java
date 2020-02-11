@@ -1,15 +1,14 @@
 package com.instahipsta.harCRUD.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
 import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
-import com.instahipsta.harCRUD.model.dto.HarDto;
-import com.instahipsta.harCRUD.model.entity.Har;
-import com.instahipsta.harCRUD.repository.HarRepo;
+import com.instahipsta.harCRUD.model.dto.HARDto;
+import com.instahipsta.harCRUD.model.entity.HAR;
+import com.instahipsta.harCRUD.repository.HARRepo;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 @Slf4j
@@ -25,59 +25,61 @@ import java.util.Optional;
 public class HarServiceImpl implements HarService {
 
     private ObjectMapper objectMapper;
-    private HarRepo harRepo;
     private RabbitTemplate rabbitTemplate;
-    private ModelMapper modelMapper;
     private RabbitmqProperties rabbitmqProperties;
+    private HARRepo harRepo;
 
     @Autowired
     public HarServiceImpl(ObjectMapper objectMapper,
-                          HarRepo harRepo,
                           RabbitTemplate rabbitTemplate,
-                          ModelMapper modelMapper,
-                          RabbitmqProperties rabbitProperties) {
+                          RabbitmqProperties rabbitProperties,
+                          HARRepo harRepo) {
 
         this.objectMapper = objectMapper;
-        this.harRepo = harRepo;
         this.rabbitTemplate = rabbitTemplate;
-        this.modelMapper = modelMapper;
         this.rabbitmqProperties = rabbitProperties;
+        this.harRepo = harRepo;
     }
 
     @Override
-    public HarDto save(Har har) {
-        return harToDto(harRepo.save(har));
+    public HAR dtoToEntity(HARDto dto) {
+        HAR har = new HAR();
+        har.setVersion(dto.getLog().getVersion());
+        har.setBrowser(dto.getLog().getBrowser().getName());
+        har.setContent(objectMapper.valueToTree(dto));
+        return har;
     }
 
     @Override
-    public HarDto harToDto(Har har) {
-        return this.modelMapper.map(har, HarDto.class);
-    }
-
-    @Override
-    public Har createHarFromFile(MultipartFile multipartFile) {
-
+    public HARDto entityToDto(HAR har) throws JsonProcessingException {
         try {
-            byte[] content = multipartFile.getBytes();
-
-            String version = objectMapper.readTree(content).at("/log/version").textValue();
-            String browser = objectMapper.readTree(content).at("/log/browser/name").textValue();
-            String browserVersion = objectMapper.readTree(content).at("/log/browser/version").textValue();
-            JsonNode jsonContent = objectMapper.readTree(content).at("/log/entries");
-
-            return new Har(0, version, browser, browserVersion, jsonContent);
-
-        } catch (IOException e) {
-            log.error("Wrong file {}", multipartFile.getOriginalFilename());
-            throw new IllegalArgumentException("In file " + multipartFile.getOriginalFilename());
+            return objectMapper.treeToValue(har.getContent(), HARDto.class);
+        }
+        catch (IOException e) {
+            log.error("Error from convert har with id {} to dto", har.getId());
+            throw e;
         }
     }
 
     @Override
-    public void sendHarInQueue(JsonNode entries) {
-        rabbitTemplate.convertAndSend(rabbitmqProperties.getHarExchange(),
-                                      rabbitmqProperties.getHarRoutingKey(),
-                                      entries);
+    public ResponseEntity<HARDto> update(HARDto dto, long id) throws JsonProcessingException {
+        Optional<HAR> findHAR = harRepo.findById(id);
+        HAR updateHAR = findHAR.orElseThrow(ResourceNotFoundException::new);
+
+        updateHAR.setContent(objectMapper.valueToTree(dto));
+        updateHAR.setBrowser(dto.getLog().getBrowser().getName());
+        updateHAR.setVersion(dto.getLog().getVersion());
+
+        HAR saveHAR = harRepo.save(updateHAR);
+
+        return new ResponseEntity<>(entityToDto(saveHAR), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<HARDto> find(long id) throws JsonProcessingException {
+        Optional<HAR> findHar = harRepo.findById(id);
+        HAR har = findHar.orElseThrow(ResourceNotFoundException::new);
+        return new ResponseEntity<>(entityToDto(har), HttpStatus.OK);
     }
 
     @Override
@@ -86,31 +88,31 @@ public class HarServiceImpl implements HarService {
     }
 
     @Override
-    public ResponseEntity<HarDto> find(long id) {
-        Optional<Har> findHar = harRepo.findById(id);
-        Har har = findHar.orElseThrow(ResourceNotFoundException::new);
-        return new ResponseEntity<>(harToDto(har), HttpStatus.OK);
+    public ResponseEntity<HARDto> add(MultipartFile file) throws IOException {
+        HARDto dto = createDtoFromFile(file);
+        HARDto saveDto = save(dto);
+
+        rabbitTemplate.convertAndSend(rabbitmqProperties.getHarExchange(),
+                                      rabbitmqProperties.getHarRoutingKey(),
+                                      saveDto);
+
+        return new ResponseEntity<>(saveDto, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<HarDto> update(HarDto harFromRequest, long harId) {
-        Optional<Har> findHar = harRepo.findById(harId);
-        Har har = findHar.orElseThrow(ResourceNotFoundException::new);
-
-        har.setVersion(harFromRequest.getVersion());
-        har.setBrowserVersion(harFromRequest.getBrowserVersion());
-        har.setBrowser(harFromRequest.getBrowser());
-
-        return new ResponseEntity<>(save(har), HttpStatus.OK);
+    public HARDto createDtoFromFile(MultipartFile multipartFile) throws IOException {
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            return objectMapper.readValue(inputStream, HARDto.class);
+        } catch (IOException e) {
+            log.error("Wrong file {}", multipartFile.getOriginalFilename());
+            throw e;
+        }
     }
 
     @Override
-    public ResponseEntity<HarDto> add(MultipartFile file) {
-        Har har = createHarFromFile(file);
-        HarDto harDto = save(har);
-
-        sendHarInQueue(harDto.getContent());
-
-        return new ResponseEntity<>(harDto, HttpStatus.OK);
+    public HARDto save(HARDto dto) throws JsonProcessingException {
+        HAR har = dtoToEntity(dto);
+        HAR saveHAR = harRepo.save(har);
+        return entityToDto(saveHAR);
     }
 }

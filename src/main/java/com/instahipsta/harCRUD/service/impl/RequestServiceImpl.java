@@ -1,65 +1,46 @@
 package com.instahipsta.harCRUD.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.model.dto.Entry;
+import com.instahipsta.harCRUD.model.dto.HARDto;
 import com.instahipsta.harCRUD.model.entity.Request;
-import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.RequestService;
-import org.springframework.http.HttpMethod;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @Service
 public class RequestServiceImpl implements RequestService {
 
     private RequestRepo requestRepo;
+    private ObjectMapper objectMapper;
+    private ModelMapper modelMapper;
 
-    public RequestServiceImpl(RequestRepo requestRepo) {
+    public RequestServiceImpl(RequestRepo requestRepo,
+                              ObjectMapper objectMapper,
+                              ModelMapper modelMapper) {
+
         this.requestRepo = requestRepo;
+        this.objectMapper = objectMapper;
+        this.modelMapper = modelMapper;
     }
 
     @Override
-    public Map<String, String> getMapValues(JsonNode mapValues) {
-        Map<String, String> map = new HashMap<>();
-        if (mapValues.isArray()) {
-            mapValues.forEach(entry -> map
-                            .put(entry.path("name").asText(), entry.path("value").asText()));
-        }
-        else {
-            map.put(mapValues.path("name").asText(), mapValues.path("value").asText());
-        }
-        return map;
-    }
-
-    @Override
-    public Request save(Request request) {
-        return requestRepo.save(request);
-    }
-
-
-    @Override
-    public Request entryToRequest(JsonNode entry,
-                                  TestProfile testProfile) {
-
-        String url = entry.at("/request/url").asText();
-        String body = entry.at("/request/postData/text").asText();
-        HttpMethod method = HttpMethod.valueOf(entry.at("/request/method").asText());
-        Map<String, String> headers = getMapValues(entry.at("/request/headers"));
-        Map<String, String> params = getMapValues(entry.at("/request/queryString"));
-
-        return new Request(0, url, body, headers, params, method, 0.0, testProfile);
-    }
-
-    @Override
-    public List<Request> jsonNodeToRequestList(JsonNode entries) {
+    public List<Request> harDtoToRequestList(HARDto harDto) throws JsonProcessingException {
         List<Request> requests = new ArrayList<>();
+        JsonNode entries = harDto.getLog().getEntries();
         for (JsonNode entry : entries) {
-            Request req = entryToRequest(entry, new TestProfile());
-            requests.add(req);
+            Entry en = objectMapper.treeToValue(entry, Entry.class);
+            Request request = modelMapper.map(en.getRequestDto(), Request.class);
+            Request saveRequest = requestRepo.save(request);
+            requests.add(saveRequest);
         }
         return requests;
     }
