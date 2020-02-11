@@ -1,18 +1,22 @@
 package com.instahipsta.harCRUD.model.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpMethod;
 
 import javax.persistence.*;
-import java.util.Map;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class Request {
 
     @Id
@@ -23,23 +27,22 @@ public class Request {
     @Length(max = 65000)
     private String url;
 
-    @Lob
-    private String body;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private JsonNode body;
 
-    @ElementCollection
-    @MapKeyColumn(name = "headers_key", length = 25000)
-    @Column(name = "headers_val", length = 25000)
-    private Map<String, String> headers;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private JsonNode headers;
 
-    @ElementCollection
-    @MapKeyColumn(name = "params_key", length = 25000)
-    @Column(name = "params_val", length = 25000)
-    private Map<String, String> params;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private JsonNode params;
 
     private HttpMethod method;
-    private Double perc;
+    private Double perc = 0.0;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
     private TestProfile testProfile;
 
 }

@@ -1,27 +1,30 @@
 package com.instahipsta.harCRUD.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.instahipsta.harCRUD.model.dto.HarDto;
-import com.instahipsta.harCRUD.model.entity.Har;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.instahipsta.harCRUD.model.dto.HARDto;
+import com.instahipsta.harCRUD.model.entity.HAR;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Service
 public interface HarService {
-    HarDto save(Har har);
 
-    HarDto harToDto(Har har);
+    HAR dtoToEntity(HARDto dto);
 
-    Har createHarFromFile(MultipartFile multipartFile);
+    HARDto entityToDto(HAR har) throws JsonProcessingException;
 
-    void sendHarInQueue(JsonNode entries);
+    HARDto save(HARDto dto) throws JsonProcessingException;
+
+    HARDto createDtoFromFile(MultipartFile multipartFile) throws IOException;
 
     void delete(long id);
 
-    ResponseEntity<HarDto> find(long id);
+    ResponseEntity<HARDto> find(long id) throws JsonProcessingException;
 
-    ResponseEntity<HarDto> update(HarDto harFromRequest, long harId);
+    ResponseEntity<HARDto> update(HARDto dto, long id) throws JsonProcessingException;
 
-    ResponseEntity<HarDto> add(MultipartFile file);
+    ResponseEntity<HARDto> add(MultipartFile file) throws IOException;
 }

@@ -11,9 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestProfileDto {
-
     private Long id;
     private List<Request> requests;
     private int requestsCount;
-
 }

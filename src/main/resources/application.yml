@@ -61,7 +61,7 @@ spring:
   jpa:
     database: POSTGRESQL
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     show-sql: true
   datasource:
     driverClassName: org.postgresql.Driver
@@ -87,7 +87,7 @@ spring:
           stateless: true
 
   liquibase:
-    enabled: true
+    enabled: false
     change-log: classpath*:db.changelog/changelog.yml
 
 rabbitmq:
