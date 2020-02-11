@@ -11,14 +11,14 @@ public class RequestDto {
     private HttpMethod method;
     private String url;
     private String httpVersion;
-    private JsonNode headers;
-    private JsonNode cookies;
+    private Header[] headers;
+    private Cookie[] cookies;
 
-    @JsonAlias("content")
-    private JsonNode body;
+    @JsonAlias({"content", "body"})
+    private Content content;
 
-    @JsonAlias("queryString")
-    private JsonNode params;
+    @JsonAlias({"queryString", "params"})
+    private QueryString queryString;
 
     private long headersSize;
 }

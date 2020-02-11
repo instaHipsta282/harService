@@ -1,6 +1,6 @@
 package com.instahipsta.harCRUD.messaging.listener;
 
-import com.instahipsta.harCRUD.model.dto.HARDto;
+import com.instahipsta.harCRUD.model.dto.Har.HARDto;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
 import org.junit.jupiter.api.Assertions;

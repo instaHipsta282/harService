@@ -1,18 +1,14 @@
 package com.instahipsta.harCRUD.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.dto.Entry;
+import com.instahipsta.harCRUD.model.dto.Har.Entry;
 import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.model.entity.TestProfile;
-import org.assertj.core.util.Maps;
 import org.junit.jupiter.params.provider.Arguments;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpMethod;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;

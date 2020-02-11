@@ -1,9 +1,7 @@
 package com.instahipsta.harCRUD.provider;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.dto.HARDto;
+import com.instahipsta.harCRUD.model.dto.Har.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.mock.web.MockMultipartFile;

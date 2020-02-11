@@ -1,7 +1,8 @@
-package com.instahipsta.harCRUD.model.dto;
+package com.instahipsta.harCRUD.model.dto.Har;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.instahipsta.harCRUD.model.dto.RequestDto;
+import com.instahipsta.harCRUD.model.dto.Response;
 import lombok.Data;
 
 @Data
@@ -12,9 +13,9 @@ public class Entry {
         @JsonAlias("request")
         private RequestDto requestDto;
 
-        private JsonNode response;
-        private JsonNode cache;
-        private JsonNode timings;
+        private Response response;
+        private Cache cache;
+        private Timings timings;
         private long time;
         private String _securityState;
         private String serverIPAddress;

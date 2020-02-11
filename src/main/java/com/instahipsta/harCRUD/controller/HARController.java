@@ -2,7 +2,7 @@ package com.instahipsta.harCRUD.controller;
 
 import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.exception.dto.CustomException;
-import com.instahipsta.harCRUD.model.dto.HARDto;
+import com.instahipsta.harCRUD.model.dto.Har.HARDto;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
