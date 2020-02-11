@@ -1,7 +1,6 @@
 package com.instahipsta.harCRUD.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import org.springframework.http.HttpMethod;
 
@@ -18,7 +17,7 @@ public class RequestDto {
     private Content content;
 
     @JsonAlias({"queryString", "params"})
-    private QueryString queryString;
+    private QueryString[] queryString;
 
     private long headersSize;
 }

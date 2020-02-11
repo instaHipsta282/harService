@@ -1,7 +1,6 @@
 package com.instahipsta.harCRUD.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.instahipsta.harCRUD.model.dto.Har.Entry;
 import com.instahipsta.harCRUD.model.dto.Har.HARDto;
@@ -20,25 +19,20 @@ import java.util.List;
 public class RequestServiceImpl implements RequestService {
 
     private RequestRepo requestRepo;
-    private ObjectMapper objectMapper;
     private ModelMapper modelMapper;
 
     public RequestServiceImpl(RequestRepo requestRepo,
-                              ObjectMapper objectMapper,
                               ModelMapper modelMapper) {
 
         this.requestRepo = requestRepo;
-        this.objectMapper = objectMapper;
         this.modelMapper = modelMapper;
     }
 
     @Override
-    public List<Request> harDtoToRequestList(HARDto harDto) throws JsonProcessingException {
+    public List<Request> harDtoToRequestList(HARDto harDto) {
         List<Request> requests = new ArrayList<>();
-        JsonNode entries = harDto.getLog().getEntries();
-        for (JsonNode entry : entries) {
-            Entry en = objectMapper.treeToValue(entry, Entry.class);
-            Request request = modelMapper.map(en.getRequestDto(), Request.class);
+        for (Entry entry : harDto.getLog().getEntries()) {
+            Request request = modelMapper.map(entry.getRequest(), Request.class);
             Request saveRequest = requestRepo.save(request);
             requests.add(saveRequest);
         }

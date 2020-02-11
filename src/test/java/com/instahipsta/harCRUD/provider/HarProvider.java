@@ -1,6 +1,7 @@
 package com.instahipsta.harCRUD.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.instahipsta.harCRUD.model.dto.Har.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
+import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
+
 public class HarProvider {
 
     static HAR getHAR() throws IOException {
@@ -24,7 +27,7 @@ public class HarProvider {
             HAR har = new HAR();
             har.setVersion(dto.getLog().getVersion());
             har.setBrowser(dto.getLog().getBrowser().getName());
-            har.setContent(objectMapper.valueToTree(dto));
+            har.setContent(objectMapper.disable(FAIL_ON_EMPTY_BEANS).valueToTree(dto));
             return har;
         }
         catch (IOException ignore) { throw ignore; }

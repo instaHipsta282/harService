@@ -20,7 +20,7 @@ public class TestProfileProvider {
         ObjectMapper objectMapper = new ObjectMapper();
         ModelMapper modelMapper = new ModelMapper();
         Entry entry = objectMapper.readValue(file, Entry.class);
-        Request request = modelMapper.map(entry.getRequestDto(), Request.class);
+        Request request = modelMapper.map(entry.getRequest(), Request.class);
         return request;
     }
 //
