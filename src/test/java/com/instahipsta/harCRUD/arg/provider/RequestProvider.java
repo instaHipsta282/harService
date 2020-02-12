@@ -16,7 +16,7 @@ import static java.util.Arrays.asList;
 public class RequestProvider {
 
     public static Request getRequest() throws IOException {
-        File file = new File("filesForTests/test4.json");
+        File file = new File("filesForTests/test5.json");
         ObjectMapper objectMapper = new ObjectMapper();
         ModelMapper modelMapper = new ModelMapper();
         Entry entry = objectMapper.readValue(file, Entry.class);

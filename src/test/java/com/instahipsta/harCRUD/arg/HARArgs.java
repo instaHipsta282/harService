@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 import static com.instahipsta.harCRUD.arg.provider.FileProvider.getMultipartFile;
 import static com.instahipsta.harCRUD.arg.provider.FileProvider.getNotValidMultipartFile;
+import static com.instahipsta.harCRUD.arg.provider.HARDtoProvider.getHARDto;
 import static com.instahipsta.harCRUD.arg.provider.HarProvider.getHAR;
-import static com.instahipsta.harCRUD.arg.provider.HarProvider.getHARDto;
 
 public class HARArgs {
 

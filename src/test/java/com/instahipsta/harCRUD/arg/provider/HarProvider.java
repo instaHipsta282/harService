@@ -23,11 +23,4 @@ public class HarProvider {
             return har;
         }
     }
-
-    public static HARDto getHARDto() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try (InputStream inputStream = new FileInputStream("filesForTests/test_archive.har")) {
-            return objectMapper.readValue(inputStream, HARDto.class);
-        }
-    }
 }

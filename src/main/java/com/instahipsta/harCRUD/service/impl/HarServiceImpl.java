@@ -114,7 +114,6 @@ public class HarServiceImpl implements HarService {
         try (InputStream inputStream = file.getInputStream()) {
             Validator validator = factory.getValidator();
             HARDto dto = objectMapper.readValue(inputStream, HARDto.class);
-            System.out.println(validator.validate(dto).size());
             if (validator.validate(dto).size() > 0) {
                 log.warn("Json from file {} is not valid", file.getOriginalFilename());
                 throw new ValidationException();

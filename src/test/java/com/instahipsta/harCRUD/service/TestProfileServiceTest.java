@@ -44,7 +44,6 @@ public class TestProfileServiceTest {
     void saveWithoutRequestsTest(TestProfile testProfile) {
         when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
-
         TestProfile savedTestProfile = testProfileService.save(testProfile);
         Assertions.assertEquals(0, savedTestProfile.getRequestsCount());
         Assertions.assertNotNull(savedTestProfile.getRequests());

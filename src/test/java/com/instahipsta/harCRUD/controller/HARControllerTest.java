@@ -76,15 +76,11 @@ public class HARControllerTest {
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#notValidFileAndIdSource")
     void updateNotValidJsonTest(MultipartFile file, long id) throws Exception {
-//        when(harRepo.findById(id)).thenReturn(Optional.of(har));
-
         mockMvc.perform(put("/har/" + id)
                 .content(file.getBytes())
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is(200));
+                .andExpect(status().is(400));
     }
-
-
 
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harAndIdSource")
@@ -160,6 +156,6 @@ public class HARControllerTest {
         mockMvc.perform(multipart("/har")
                 .file(file)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().is(200));
+                .andExpect(status().is(400));
     }
 }

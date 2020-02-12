@@ -5,7 +5,6 @@ import com.instahipsta.harCRUD.exception.dto.CustomException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
-import javax.validation.Validator;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -24,9 +22,6 @@ import static org.springframework.http.HttpStatus.*;
 public class HARController {
 
     private HarService harService;
-
-    @Autowired
-    protected Validator validator;
 
     public HARController(HarService harService) {
         this.harService = harService;
@@ -90,8 +85,13 @@ public class HARController {
         try {
             return harService.add(file);
         }
-        catch (Exception e) {
-            log.error("Exception in addHar method, file {} error: {}", file.getOriginalFilename(), e);
+        catch(ValidationException e) {
+            return ResponseEntity
+                    .status(BAD_REQUEST)
+                    .body(new CustomException("Your har file is not correct"));
+        }
+        catch (Exception ex) {
+            log.error("Exception in addHar method, file {} error: {}", file.getOriginalFilename(), ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
                     .body(new CustomException("Something went wrong"));

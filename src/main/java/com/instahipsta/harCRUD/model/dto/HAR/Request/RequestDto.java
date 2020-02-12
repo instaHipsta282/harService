@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpMethod;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -19,6 +20,7 @@ public class RequestDto {
     private String url;
     private String httpVersion;
     @NotNull
+    @Valid
     private Header[] headers;
     private Cookie[] cookies;
 

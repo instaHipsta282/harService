@@ -1,6 +1,5 @@
 package com.instahipsta.harCRUD.messaging.listener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.service.RequestService;
