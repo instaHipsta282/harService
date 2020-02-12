@@ -2,16 +2,20 @@ package com.instahipsta.harCRUD.controller;
 
 import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.exception.dto.CustomException;
-import com.instahipsta.harCRUD.model.dto.Har.HARDto;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+
+import static org.springframework.http.HttpStatus.*;
 
 
 @RestController
@@ -21,12 +25,15 @@ public class HARController {
 
     private HarService harService;
 
+    @Autowired
+    protected Validator validator;
+
     public HARController(HarService harService) {
         this.harService = harService;
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateHar(@RequestBody HARDto dto,
+    public ResponseEntity<?> updateHar(@Valid @RequestBody HARDto dto,
                                        @PathVariable long id) {
         try {
             return harService.update(dto, id);

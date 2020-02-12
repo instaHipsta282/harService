@@ -1,9 +1,7 @@
 package com.instahipsta.harCRUD.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instahipsta.harCRUD.model.dto.Har.Entry;
-import com.instahipsta.harCRUD.model.dto.Har.HARDto;
+import com.instahipsta.harCRUD.model.dto.HAR.Entry;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.RequestService;

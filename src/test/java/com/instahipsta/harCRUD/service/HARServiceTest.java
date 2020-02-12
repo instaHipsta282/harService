@@ -2,21 +2,25 @@ package com.instahipsta.harCRUD.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
 import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
-import com.instahipsta.harCRUD.model.dto.Har.HARDto;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import com.instahipsta.harCRUD.repository.HARRepo;
 import com.instahipsta.harCRUD.service.impl.HarServiceImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,24 +31,31 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class HARServiceTest {
 
-    @Autowired
+    @InjectMocks
     private HarServiceImpl harService;
 
-    @Autowired
+    @Spy
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @Spy
+    private RabbitmqProperties rabbitmqProperties;
+
+    @Mock
     private HARRepo harRepo;
 
-    @MockBean
+    @Mock
     private RabbitTemplate rabbitTemplate;
 
+    @BeforeEach
+    void setConfig() {
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+    }
+
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harDtoSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoSource")
     void dtoToEntity(HARDto dto) {
         HAR entity = harService.dtoToEntity(dto);
         Assertions.assertEquals(entity.getVersion(), dto.getLog().getVersion());
@@ -53,7 +64,7 @@ public class HARServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harSource")
     void entityToDto(HAR entity) throws JsonProcessingException {
         HARDto dto = harService.entityToDto(entity);
         Assertions.assertEquals(dto, objectMapper.treeToValue(entity.getContent(), HARDto.class));
@@ -61,7 +72,7 @@ public class HARServiceTest {
 
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harDtoHarAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoHarAndIdSource")
     void updateTest(HARDto dto, HAR har, long id) throws JsonProcessingException {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
         when(harRepo.save(any(HAR.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
@@ -77,7 +88,7 @@ public class HARServiceTest {
 
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harDtoAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoAndIdSource")
     void updateNegativeTest(HARDto dto, long id) {
         when(harRepo.findById(id)).thenReturn(Optional.empty());
 
@@ -86,7 +97,7 @@ public class HARServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harAndIdSource")
     void findTest(HAR har, long id) throws JsonProcessingException {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
 
@@ -113,7 +124,7 @@ public class HARServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#fileSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileSource")
     void addTest(MultipartFile file) throws IOException {
         when(harRepo.save(any(HAR.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
@@ -126,7 +137,7 @@ public class HARServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#fileSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileSource")
     void createDtoFromFileTest(MultipartFile file) throws IOException {
         HARDto dto = harService.createDtoFromFile(file);
 
@@ -135,12 +146,10 @@ public class HARServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harDtoSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoSource")
     void saveTest(HARDto dto) throws JsonProcessingException {
         when(harRepo.save(any(HAR.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
-
         HARDto saveDto = harService.save(dto);
-
         Assertions.assertEquals(dto.getLog().getVersion(), saveDto.getLog().getVersion());
         Assertions.assertEquals(dto.getLog().getBrowser().getName(), saveDto.getLog().getBrowser().getName());
         Assertions.assertEquals(dto, saveDto);

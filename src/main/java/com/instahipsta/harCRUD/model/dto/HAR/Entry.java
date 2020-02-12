@@ -1,13 +1,15 @@
-package com.instahipsta.harCRUD.model.dto.Har;
+package com.instahipsta.harCRUD.model.dto.HAR;
 
-import com.instahipsta.harCRUD.model.dto.RequestDto;
-import com.instahipsta.harCRUD.model.dto.Response;
+import com.instahipsta.harCRUD.model.dto.HAR.Request.RequestDto;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 public class Entry {
         private String pageref;
         private String startedDateTime;
+        @NotNull
         private RequestDto request;
         private Response response;
         private Cache cache;

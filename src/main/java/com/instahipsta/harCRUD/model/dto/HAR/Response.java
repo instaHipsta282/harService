@@ -1,5 +1,8 @@
-package com.instahipsta.harCRUD.model.dto;
+package com.instahipsta.harCRUD.model.dto.HAR;
 
+import com.instahipsta.harCRUD.model.dto.HAR.Request.Content;
+import com.instahipsta.harCRUD.model.dto.HAR.Request.Cookie;
+import com.instahipsta.harCRUD.model.dto.HAR.Request.Header;
 import lombok.Data;
 
 @Data

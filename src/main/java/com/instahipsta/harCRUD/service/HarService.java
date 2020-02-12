@@ -1,7 +1,7 @@
 package com.instahipsta.harCRUD.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.instahipsta.harCRUD.model.dto.Har.HARDto;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,5 @@
-package com.instahipsta.harCRUD.model.dto.Har;
+package com.instahipsta.harCRUD.model.dto.HAR;
 
-import com.instahipsta.harCRUD.model.dto.PageTimings;
 import lombok.Data;
 
 @Data

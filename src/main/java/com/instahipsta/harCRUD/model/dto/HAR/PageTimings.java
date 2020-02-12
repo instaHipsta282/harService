@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.model.dto;
+package com.instahipsta.harCRUD.model.dto.HAR;
 
 import lombok.Data;
 

@@ -1,10 +1,11 @@
 package com.instahipsta.harCRUD.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
 import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
-import com.instahipsta.harCRUD.model.dto.Har.HARDto;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import com.instahipsta.harCRUD.repository.HARRepo;
 import com.instahipsta.harCRUD.service.HarService;
@@ -16,6 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Validation;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -28,6 +33,7 @@ public class HarServiceImpl implements HarService {
     private RabbitTemplate rabbitTemplate;
     private RabbitmqProperties rabbitmqProperties;
     private HARRepo harRepo;
+    private ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 
     @Autowired
     public HarServiceImpl(ObjectMapper objectMapper,
@@ -55,9 +61,13 @@ public class HarServiceImpl implements HarService {
         try {
             return objectMapper.treeToValue(har.getContent(), HARDto.class);
         }
-        catch (IOException e) {
-            log.error("Error from convert har with id {} to dto", har.getId());
+        catch (JsonMappingException e) {
+            log.error("Json mapping error from har with id {} to dto. Exception: {}", har.getId(), e);
             throw e;
+        }
+        catch (JsonProcessingException ex) {
+            log.error("Some json deserializing error from har with id {} to dto. Exception: {}", har.getId(), ex);
+            throw ex;
         }
     }
 
@@ -93,19 +103,35 @@ public class HarServiceImpl implements HarService {
         HARDto saveDto = save(dto);
 
         rabbitTemplate.convertAndSend(rabbitmqProperties.getHarExchange(),
-                                      rabbitmqProperties.getHarRoutingKey(),
-                                      saveDto);
+                rabbitmqProperties.getHarRoutingKey(),
+                saveDto);
 
         return new ResponseEntity<>(saveDto, HttpStatus.OK);
     }
 
     @Override
-    public HARDto createDtoFromFile(MultipartFile multipartFile) throws IOException {
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            return objectMapper.readValue(inputStream, HARDto.class);
-        } catch (IOException e) {
-            log.error("Wrong file {}", multipartFile.getOriginalFilename());
+    public HARDto createDtoFromFile(MultipartFile file) throws IOException {
+        try (InputStream inputStream = file.getInputStream()) {
+            Validator validator = factory.getValidator();
+            HARDto dto = objectMapper.readValue(inputStream, HARDto.class);
+            System.out.println(validator.validate(dto).size());
+            if (validator.validate(dto).size() > 0) {
+                log.warn("Json from file {} is not valid", file.getOriginalFilename());
+                throw new ValidationException();
+            }
+            return dto;
+        }
+        catch (JsonMappingException e) {
+            log.error("Json mapping error from file {}. Exception: {}", file.getOriginalFilename(), e);
             throw e;
+        }
+        catch (JsonProcessingException ex) {
+            log.error("Some json deserializing error from file {}. Exception: {}", file.getOriginalFilename(), ex);
+            throw ex;
+        }
+        catch (IOException exc) {
+            log.error("Some io error from file {}. Error: {}", file.getOriginalFilename(), exc);
+            throw exc;
         }
     }
 
