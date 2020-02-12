@@ -1,5 +1,7 @@
 package com.instahipsta.harCRUD.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.amqp.core.Binding;
@@ -38,6 +40,13 @@ public class AppConfiguration {
                 .setSkipNullEnabled(true)
                 .setFieldAccessLevel(PRIVATE);
         return mapper;
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        return objectMapper;
     }
 
     @Bean

@@ -1,7 +1,6 @@
 package com.instahipsta.harCRUD.messaging.listener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.instahipsta.harCRUD.model.dto.HARDto;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
@@ -26,7 +25,7 @@ public class RabbitMqListener {
     }
 
     @RabbitListener(queues = "${rabbitmq.harQueue}")
-    public void harWorker(HARDto dto) throws JsonProcessingException {
+    public void harWorker(HARDto dto) {
         List<Request> requests = requestService.harDtoToRequestList(dto);
         testProfileService.save(requests);
     }

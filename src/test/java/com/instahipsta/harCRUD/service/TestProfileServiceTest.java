@@ -5,32 +5,30 @@ import com.instahipsta.harCRUD.model.entity.TestProfile;
 import com.instahipsta.harCRUD.repository.TestProfileRepo;
 import com.instahipsta.harCRUD.service.impl.TestProfileServiceImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.AdditionalAnswers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class TestProfileServiceTest {
 
-    @Autowired
+    @InjectMocks
     private TestProfileServiceImpl testProfileService;
 
-    @MockBean
+    @Mock
     private TestProfileRepo testProfileRepo;
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.TestProfileProvider#testProfileSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.TestProfileArgs#testProfileSource")
     void saveTest(TestProfile testProfile) {
 
         when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
@@ -42,10 +40,9 @@ public class TestProfileServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.TestProfileProvider#testProfileWithoutRequestsSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.TestProfileArgs#testProfileWithoutRequestsSource")
     void saveWithoutRequestsTest(TestProfile testProfile) {
         when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
-
 
         TestProfile savedTestProfile = testProfileService.save(testProfile);
         Assertions.assertEquals(0, savedTestProfile.getRequestsCount());
@@ -53,7 +50,7 @@ public class TestProfileServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.TestProfileProvider#requestsSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.TestProfileArgs#requestsSource")
     void saveWithRequestsTest(List<Request> requests) {
         when(testProfileRepo.save(any(TestProfile.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 

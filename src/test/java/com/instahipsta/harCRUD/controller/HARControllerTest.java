@@ -23,8 +23,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
 @AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class HARControllerTest {
 
     @Autowired
@@ -37,7 +37,7 @@ public class HARControllerTest {
     private RabbitTemplate rabbitTemplate;
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#fileHarAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileHarAndIdSource")
     void updateTest(MultipartFile file, HAR har, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
         when(harRepo.save(any(HAR.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
@@ -63,7 +63,7 @@ public class HARControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#fileAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileAndIdSource")
     void updateNotFoundTest(MultipartFile file, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.empty());
 
@@ -73,9 +73,17 @@ public class HARControllerTest {
                 .andExpect(status().is(404));
     }
 
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#notValidFileAndIdSource")
+    void updateNotValidJsonTest(MultipartFile file, long id) throws Exception {
+        mockMvc.perform(put("/har/" + id)
+                .content(file.getBytes())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(400));
+    }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harAndIdSource")
     void getTest(HAR har, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
 
@@ -98,7 +106,7 @@ public class HARControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harAndIdSource")
     void getNotFoundTest(HAR har, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.empty());
 
@@ -107,7 +115,7 @@ public class HARControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harAndIdSource")
     void deleteTest(HAR har, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
 
@@ -116,7 +124,7 @@ public class HARControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#fileSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileSource")
     void addTest(MockMultipartFile file) throws Exception {
         when(harRepo.save(any(HAR.class)))
                 .thenAnswer(AdditionalAnswers.returnsFirstArg());
@@ -137,5 +145,17 @@ public class HARControllerTest {
                         "{\"name\":\"Firefox\"," +
                         "\"version\":\"70.0.1\"}");
         Assertions.assertTrue(isContains);
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#notValidFileSource")
+    void addInvalidJsonTest(MockMultipartFile file) throws Exception {
+        when(harRepo.save(any(HAR.class)))
+                .thenAnswer(AdditionalAnswers.returnsFirstArg());
+
+        mockMvc.perform(multipart("/har")
+                .file(file)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().is(400));
     }
 }

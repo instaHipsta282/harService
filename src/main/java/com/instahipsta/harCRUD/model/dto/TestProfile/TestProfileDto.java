@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.model.dto;
+package com.instahipsta.harCRUD.model.dto.TestProfile;
 
 import com.instahipsta.harCRUD.model.entity.Request;
 import lombok.AllArgsConstructor;

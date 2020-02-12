@@ -1,18 +1,18 @@
 package com.instahipsta.harCRUD.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.instahipsta.harCRUD.model.dto.HARDto;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.repository.RequestRepo;
 import com.instahipsta.harCRUD.service.impl.RequestServiceImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.AdditionalAnswers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpMethod;
 
 import java.util.List;
@@ -20,19 +20,21 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class RequestServiceTest {
 
-    @Autowired
+    @InjectMocks
     private RequestServiceImpl requestService;
 
-    @MockBean
+    @Mock
     private RequestRepo requestRepo;
 
+    @Mock
+    private ModelMapper modelMapper;
+
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.provider.HarProvider#harDtoSource")
-    void harDtoToRequestListTest(HARDto harDto) throws JsonProcessingException {
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoSource")
+    void harDtoToRequestListTest(HARDto harDto) {
         when(requestRepo.save(any(Request.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
         List<Request> requests = requestService.harDtoToRequestList(harDto);
