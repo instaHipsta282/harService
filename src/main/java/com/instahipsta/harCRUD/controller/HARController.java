@@ -1,7 +1,10 @@
 package com.instahipsta.harCRUD.controller;
 
-import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
-import com.instahipsta.harCRUD.exception.dto.CustomException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.model.exception.JsonValidateFailedException;
+import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
+import com.instahipsta.harCRUD.model.exception.dto.CustomException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +42,8 @@ public class HARController {
                     .status(NOT_FOUND)
                     .body(new CustomException("There is no such har with id " + id));
         }
-        catch (Exception e) {
-            log.error("Exception in updateHar method, har id is {}, error: {}", id, e);
+        catch (Exception ex) {
+            log.error("Exception in updateHar method, har id is {}, error: {}", id, ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
                     .body(new CustomException("Something went wrong"));
@@ -58,8 +61,8 @@ public class HARController {
                     .status(NOT_FOUND)
                     .body(new CustomException("There is no such har with id " + id));
         }
-        catch (Exception e) {
-            log.error("Exception in getHar method, har id is {} error: {}", id, e);
+        catch (Exception ex) {
+            log.error("Exception in getHar method, har id is {} error: {}", id, ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
                     .body(new CustomException("Something went wrong"));
@@ -72,8 +75,8 @@ public class HARController {
             harService.delete(id);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        catch (Exception e) {
-            log.error("Exception in deleteHar method, har id is {}, error: {}", id, e);
+        catch (Exception ex) {
+            log.error("Exception in deleteHar method, har id is {}, error: {}", id, ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
                     .body(new CustomException("Something went wrong"));
@@ -85,10 +88,10 @@ public class HARController {
         try {
             return harService.add(file);
         }
-        catch(ValidationException e) {
+        catch(JsonValidateFailedException ex) {
             return ResponseEntity
                     .status(BAD_REQUEST)
-                    .body(new CustomException("Your har file is not correct"));
+                    .body(new CustomException(ex.getFailList().toString()));
         }
         catch (Exception ex) {
             log.error("Exception in addHar method, file {} error: {}", file.getOriginalFilename(), ex);

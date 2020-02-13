@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
-import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
+import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import com.instahipsta.harCRUD.repository.HARRepo;

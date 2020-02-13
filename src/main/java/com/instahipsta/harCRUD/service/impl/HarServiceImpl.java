@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
-import com.instahipsta.harCRUD.exception.ResourceNotFoundException;
+import com.instahipsta.harCRUD.model.exception.JsonValidateFailedException;
+import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import com.instahipsta.harCRUD.repository.HARRepo;
@@ -17,13 +18,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import javax.validation.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,7 +35,7 @@ public class HarServiceImpl implements HarService {
     private RabbitTemplate rabbitTemplate;
     private RabbitmqProperties rabbitmqProperties;
     private HARRepo harRepo;
-    private ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Autowired
     public HarServiceImpl(ObjectMapper objectMapper,
@@ -61,9 +63,9 @@ public class HarServiceImpl implements HarService {
         try {
             return objectMapper.treeToValue(har.getContent(), HARDto.class);
         }
-        catch (JsonMappingException e) {
-            log.error("Json mapping error from har with id {} to dto. Exception: {}", har.getId(), e);
-            throw e;
+        catch (JsonMappingException ex) {
+            log.error("Json mapping error from har with id {} to dto. Exception: {}", har.getId(), ex);
+            throw ex;
         }
         catch (JsonProcessingException ex) {
             log.error("Some json deserializing error from har with id {} to dto. Exception: {}", har.getId(), ex);
@@ -112,25 +114,27 @@ public class HarServiceImpl implements HarService {
     @Override
     public HARDto createDtoFromFile(MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream()) {
-            Validator validator = factory.getValidator();
             HARDto dto = objectMapper.readValue(inputStream, HARDto.class);
-            if (validator.validate(dto).size() > 0) {
-                log.warn("Json from file {} is not valid", file.getOriginalFilename());
-                throw new ValidationException();
+            Set<ConstraintViolation<HARDto>> failNode = validator.validate(dto);
+            List<String> failList = new ArrayList<>();
+            failNode.forEach(n -> failList.add(n.getPropertyPath().toString()));
+            if (failNode.size() > 0) {
+                log.warn("Json from file {} is not valid. {} not found", file.getOriginalFilename(), failList);
+                throw new JsonValidateFailedException(failList);
             }
             return dto;
         }
-        catch (JsonMappingException e) {
-            log.error("Json mapping error from file {}. Exception: {}", file.getOriginalFilename(), e);
-            throw e;
+        catch (JsonMappingException ex) {
+            log.error("Json mapping error from file {}. Exception: {}", file.getOriginalFilename(), ex);
+            throw ex;
         }
         catch (JsonProcessingException ex) {
             log.error("Some json deserializing error from file {}. Exception: {}", file.getOriginalFilename(), ex);
             throw ex;
         }
-        catch (IOException exc) {
-            log.error("Some io error from file {}. Error: {}", file.getOriginalFilename(), exc);
-            throw exc;
+        catch (IOException ex) {
+            log.error("Some io error from file {}. Error: {}", file.getOriginalFilename(), ex);
+            throw ex;
         }
     }
 

@@ -1,4 +1,4 @@
-package com.instahipsta.harCRUD.exception.dto;
+package com.instahipsta.harCRUD.model.exception.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
