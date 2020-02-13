@@ -3,7 +3,9 @@ package com.instahipsta.harCRUD.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
+import com.instahipsta.harCRUD.model.exception.JsonValidateFailedException;
 import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
@@ -56,8 +58,9 @@ public class HARServiceTest {
 
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoSource")
-    void dtoToEntity(HARDto dto) {
+    void dtoToEntityTest(HARDto dto) {
         HAR entity = harService.dtoToEntity(dto);
+
         Assertions.assertEquals(entity.getVersion(), dto.getLog().getVersion());
         Assertions.assertEquals(entity.getBrowser(), dto.getLog().getBrowser().getName());
         Assertions.assertEquals(entity.getContent(), objectMapper.valueToTree(dto));
@@ -65,11 +68,11 @@ public class HARServiceTest {
 
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harSource")
-    void entityToDto(HAR entity) throws JsonProcessingException {
+    void entityToDtoTest(HAR entity) throws JsonProcessingException {
         HARDto dto = harService.entityToDto(entity);
+
         Assertions.assertEquals(dto, objectMapper.treeToValue(entity.getContent(), HARDto.class));
     }
-
 
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoHarAndIdSource")
@@ -143,6 +146,13 @@ public class HARServiceTest {
 
         Assertions.assertEquals("1.2", dto.getLog().getVersion());
         Assertions.assertEquals("Firefox", dto.getLog().getBrowser().getName());
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#notValidFileSource")
+    void createDtoFromFileNegativeTest(MultipartFile file) {
+        Assertions.assertThrows(JsonValidateFailedException.class, () ->
+                harService.createDtoFromFile(file));
     }
 
     @ParameterizedTest

@@ -11,7 +11,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpMethod;
 
@@ -29,17 +32,18 @@ public class RequestServiceTest {
     @Mock
     private RequestRepo requestRepo;
 
-    @Mock
+    @Spy
     private ModelMapper modelMapper;
 
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harDtoSource")
     void harDtoToRequestListTest(HARDto harDto) {
-        when(requestRepo.save(any(Request.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
+        when(requestRepo.save(any())).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
         List<Request> requests = requestService.harDtoToRequestList(harDto);
 
         Assertions.assertEquals(1, requests.size());
+        requests.forEach(r -> System.out.println(r.toString()));
         Assertions.assertEquals(HttpMethod.GET, requests.get(0).getMethod());
         Assertions.assertEquals("https://www.youtube.com/?gl=RU", requests.get(0).getUrl());
     }

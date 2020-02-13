@@ -12,11 +12,11 @@ import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_
 
 public class HarProvider {
 
-    public static HAR getHAR() throws IOException {
+    public static HAR getHAR(String filename) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try (InputStream inputStream = TypeData.ClassName.class
-                .getClassLoader().getResourceAsStream("data/test_archive.har")) {
+                .getClassLoader().getResourceAsStream("data/" + filename)) {
 
             HARDto dto = objectMapper.readValue(inputStream, HARDto.class);
             HAR har = new HAR();

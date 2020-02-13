@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
-import com.instahipsta.harCRUD.model.exception.JsonValidateFailedException;
-import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
+import com.instahipsta.harCRUD.model.exception.JsonValidateFailedException;
+import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.repository.HARRepo;
 import com.instahipsta.harCRUD.service.HarService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +18,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
