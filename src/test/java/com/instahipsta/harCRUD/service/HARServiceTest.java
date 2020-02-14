@@ -1,14 +1,14 @@
 package com.instahipsta.harCRUD.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.instahipsta.harCRUD.config.property.RabbitmqProperties;
-import com.instahipsta.harCRUD.model.exception.JsonValidateFailedException;
-import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
+import com.instahipsta.harCRUD.model.exception.JsonValidateFailedException;
+import com.instahipsta.harCRUD.model.exception.ResourceNotFoundException;
 import com.instahipsta.harCRUD.repository.HARRepo;
 import com.instahipsta.harCRUD.service.impl.HarServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -72,6 +72,15 @@ public class HARServiceTest {
         HARDto dto = harService.entityToDto(entity);
 
         Assertions.assertEquals(dto, objectMapper.treeToValue(entity.getContent(), HARDto.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harSource")
+    void entityToDtoNegativeTest(HAR entity) throws JsonProcessingException {
+        entity.setContent(objectMapper.readTree("{ \"kek\":\"\"}"));
+
+        Assertions.assertThrows(JsonMappingException.class, () ->
+                harService.entityToDto(entity));
     }
 
     @ParameterizedTest
@@ -152,6 +161,20 @@ public class HARServiceTest {
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#notValidFileSource")
     void createDtoFromFileNegativeTest(MultipartFile file) {
         Assertions.assertThrows(JsonValidateFailedException.class, () ->
+                harService.createDtoFromFile(file));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#jsonMappingExFileSource")
+    void createDtoFromFileJsonMappingExTest(MultipartFile file) {
+        Assertions.assertThrows(JsonMappingException.class, () ->
+                harService.createDtoFromFile(file));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#jsonProcessingExFileSource")
+    void createDtoFromFileJsonProcessingExTest(MultipartFile file) {
+        Assertions.assertThrows(JsonProcessingException.class, () ->
                 harService.createDtoFromFile(file));
     }
 

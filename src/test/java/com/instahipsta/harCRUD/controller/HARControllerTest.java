@@ -3,9 +3,12 @@ package com.instahipsta.harCRUD.controller;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import com.instahipsta.harCRUD.repository.HARRepo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.AdditionalAnswers;
+import org.mockito.MockitoAnnotations;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,12 +19,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -36,6 +39,11 @@ public class HARControllerTest {
 
     @MockBean
     private RabbitTemplate rabbitTemplate;
+
+    @BeforeEach
+    void initMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileHarAndIdSource")
@@ -84,6 +92,17 @@ public class HARControllerTest {
     }
 
     @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileAndIdSource")
+    void updateRuntimeExTest(MultipartFile file, long id) throws Exception {
+        when(harRepo.findById(id)).thenThrow(RuntimeException.class);
+
+         mockMvc.perform(put("/har/" + id)
+                .content(file.getBytes())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(500));
+    }
+
+    @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harAndIdSource")
     void getTest(HAR har, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
@@ -107,12 +126,21 @@ public class HARControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#harAndIdSource")
-    void getNotFoundTest(HAR har, long id) throws Exception {
+    @ValueSource(longs = 1L)
+    void getNotFoundTest(long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/har/" + id))
                 .andExpect(status().is(404));
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = 1L)
+    void getRuntimeExTest(long id) throws Exception {
+        when(harRepo.findById(id)).thenThrow(RuntimeException.class);
+
+        mockMvc.perform(get("/har/" + id))
+                .andExpect(status().is(500));
     }
 
     @ParameterizedTest
@@ -127,7 +155,7 @@ public class HARControllerTest {
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileSource")
     void addTest(MockMultipartFile file) throws Exception {
-        when(harRepo.save(any(HAR.class)))
+        when(harRepo.save(any()))
                 .thenAnswer(AdditionalAnswers.returnsFirstArg());
 
         boolean isContains = mockMvc.perform(multipart("/har")
@@ -157,7 +185,18 @@ public class HARControllerTest {
         mockMvc.perform(multipart("/har")
                 .file(file)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andDo(print())
                 .andExpect(status().is(400));
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileSource")
+    void addRuntimeExTest(MockMultipartFile file) throws Exception {
+        when(harRepo.save(any(HAR.class)))
+                .thenThrow(RuntimeException.class);
+
+        mockMvc.perform(multipart("/har")
+                .file(file)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().is(500));
     }
 }

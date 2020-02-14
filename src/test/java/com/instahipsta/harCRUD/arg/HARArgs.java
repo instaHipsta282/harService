@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import static com.instahipsta.harCRUD.arg.provider.FileProvider.getMultipartFile;
-import static com.instahipsta.harCRUD.arg.provider.FileProvider.getNotValidMultipartFile;
 import static com.instahipsta.harCRUD.arg.provider.HARDtoProvider.getHARDto;
 import static com.instahipsta.harCRUD.arg.provider.HarProvider.getHAR;
 
@@ -14,31 +13,41 @@ public class HARArgs {
 
     static Stream<Arguments> fileHarAndIdSource() throws IOException {
         return Stream.of(Arguments.of(
-                getMultipartFile(),
+                getMultipartFile("test_archive.har"),
                 getHAR("test_archive.har"),
                 1L));
     }
 
     static Stream<Arguments> fileAndIdSource() throws IOException {
         return Stream.of(Arguments.of(
-                getMultipartFile(),
+                getMultipartFile("test_archive.har"),
                 1L));
     }
 
     static Stream<Arguments> notValidFileAndIdSource() throws IOException {
         return Stream.of(Arguments.of(
-                getNotValidMultipartFile(),
+                getMultipartFile("test4.json"),
                 1L));
     }
 
     static Stream<Arguments> fileSource() throws IOException {
         return Stream.of(Arguments.of(
-                getMultipartFile()));
+                getMultipartFile("test_archive.har")));
     }
 
     static Stream<Arguments> notValidFileSource() throws IOException {
         return Stream.of(Arguments.of(
-                getNotValidMultipartFile()));
+                getMultipartFile("test4.json")));
+    }
+
+    static Stream<Arguments> jsonMappingExFileSource() throws IOException {
+        return Stream.of(Arguments.of(
+                getMultipartFile("test5.json")));
+    }
+
+    static Stream<Arguments> jsonProcessingExFileSource() throws IOException {
+        return Stream.of(Arguments.of(
+                getMultipartFile("image.webp")));
     }
 
     static Stream<Arguments> harAndIdSource() throws IOException {

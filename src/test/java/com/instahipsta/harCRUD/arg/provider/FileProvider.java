@@ -14,19 +14,10 @@ import static com.vladmihalcea.hibernate.type.util.ClassLoaderUtils.getClassLoad
 
 public class FileProvider {
 
-    public static MultipartFile getMultipartFile() throws IOException {
+    public static MultipartFile getMultipartFile(String filename) throws IOException {
 
         try (InputStream inputStream = TypeData.ClassName.class
-                .getClassLoader().getResourceAsStream("data/test_archive.har")) {
-
-            return new MockMultipartFile("file", inputStream);
-        }
-    }
-
-    public static MultipartFile getNotValidMultipartFile() throws IOException {
-
-        try (InputStream inputStream = TypeData.ClassName.class
-                .getClassLoader().getResourceAsStream("data/test4.json")) {
+                .getClassLoader().getResourceAsStream("data/" + filename)) {
 
             return new MockMultipartFile("file", inputStream);
         }
