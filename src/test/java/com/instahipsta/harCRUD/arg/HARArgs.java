@@ -3,17 +3,26 @@ package com.instahipsta.harCRUD.arg;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import static com.instahipsta.harCRUD.arg.provider.FileProvider.getMultipartFile;
 import static com.instahipsta.harCRUD.arg.provider.HARDtoProvider.getHARDto;
 import static com.instahipsta.harCRUD.arg.provider.HarProvider.getHAR;
+import static com.instahipsta.harCRUD.arg.provider.RequestProvider.getRequest;
 
 public class HARArgs {
 
     static Stream<Arguments> fileHarAndIdSource() throws IOException {
         return Stream.of(Arguments.of(
                 getMultipartFile("test_archive.har"),
+                getHAR("test_archive.har"),
+                1L));
+    }
+
+    static Stream<Arguments> newFileHarAndIdSource() throws IOException {
+        return Stream.of(Arguments.of(
+                getMultipartFile("test_archive_upd.har"),
                 getHAR("test_archive.har"),
                 1L));
     }
@@ -82,5 +91,11 @@ public class HARArgs {
     static Stream<Arguments> harDtoSource() throws IOException {
         return Stream.of(Arguments.of(
                 getHARDto()));
+    }
+
+    static Stream<Arguments> harDtoAndRequestsSource() throws IOException {
+        return Stream.of(Arguments.of(
+                getHARDto(),
+                Collections.singletonList(getRequest())));
     }
 }

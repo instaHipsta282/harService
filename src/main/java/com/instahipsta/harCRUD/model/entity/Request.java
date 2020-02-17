@@ -3,6 +3,7 @@ package com.instahipsta.harCRUD.model.entity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)

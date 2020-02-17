@@ -34,7 +34,7 @@ public class TestProfileServiceImpl implements TestProfileService {
 
     @Override
     public TestProfile save(List<Request> requests) {
-        TestProfile testProfile = new TestProfile();
+        TestProfile testProfile = TestProfile.builder().build();
 
         testProfile.setRequests(requests);
         testProfile.setRequestsCount(requests.size());

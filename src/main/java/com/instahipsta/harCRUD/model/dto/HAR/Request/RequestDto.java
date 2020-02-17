@@ -2,6 +2,7 @@ package com.instahipsta.harCRUD.model.dto.HAR.Request;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestDto {

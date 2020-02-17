@@ -23,10 +23,9 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
+import static java.util.Arrays.asList;
 
 @Slf4j
 @Service
@@ -52,11 +51,10 @@ public class HarServiceImpl implements HarService {
 
     @Override
     public HAR dtoToEntity(HARDto dto) {
-        HAR har = new HAR();
-        har.setVersion(dto.getLog().getVersion());
-        har.setBrowser(dto.getLog().getBrowser().getName());
-        har.setContent(objectMapper.valueToTree(dto));
-        return har;
+        return HAR.builder()
+                .version(dto.getLog().getVersion())
+                .browser(dto.getLog().getBrowser().getName())
+                .content(objectMapper.valueToTree(dto)).build();
     }
 
     @Override
@@ -115,19 +113,24 @@ public class HarServiceImpl implements HarService {
     @Override
     public HARDto createDtoFromFile(MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream()) {
+
             HARDto dto = objectMapper.readValue(inputStream, HARDto.class);
+
             Set<ConstraintViolation<HARDto>> failNode = validator.validate(dto);
+
             List<String> failList = new ArrayList<>();
             failNode.forEach(n -> failList.add(n.getPropertyPath().toString()));
+
             if (failNode.size() > 0) {
                 log.warn("Json from file {} is not valid. {} not found", file.getOriginalFilename(), failList);
                 throw new JsonValidateFailedException(failList);
             }
+
             return dto;
         }
         catch (JsonMappingException ex) {
             log.error("Json mapping error from file {}. Exception: {}", file.getOriginalFilename(), ex);
-            throw ex;
+            throw new JsonValidateFailedException(Collections.singletonList(""));
         }
         catch (JsonProcessingException ex) {
             log.error("Some json deserializing error from file {}. Exception: {}", file.getOriginalFilename(), ex);

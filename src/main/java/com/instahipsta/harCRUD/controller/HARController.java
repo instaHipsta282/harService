@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
+import static com.instahipsta.harCRUD.model.exception.ExceptionMessage.*;
 import static org.springframework.http.HttpStatus.*;
 
 
@@ -37,13 +38,17 @@ public class HARController {
             log.warn("Har with id {} not found", id);
             return ResponseEntity
                     .status(NOT_FOUND)
-                    .body(new CustomException("There is no such har with id " + id));
+                    .body(CustomException.builder()
+                            .message(RESOURCE_NOT_FOUND_EXCEPTION.getErrorMessage() + id)
+                            .build());
         }
         catch (Exception ex) {
             log.error("Exception in updateHar method, har id is {}, error: {}", id, ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
-                    .body(new CustomException("Something went wrong"));
+                    .body(CustomException.builder()
+                            .message(INTERNAL_SERVER_ERROR_C.getErrorMessage())
+                            .build());
         }
     }
 
@@ -56,13 +61,17 @@ public class HARController {
             log.warn("Har with id {} not found", id);
             return ResponseEntity
                     .status(NOT_FOUND)
-                    .body(new CustomException("There is no such har with id " + id));
+                    .body(CustomException.builder()
+                            .message(RESOURCE_NOT_FOUND_EXCEPTION.getErrorMessage() + id)
+                            .build());
         }
         catch (Exception ex) {
             log.error("Exception in getHar method, har id is {} error: {}", id, ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
-                    .body(new CustomException("Something went wrong"));
+                    .body(CustomException.builder()
+                            .message(INTERNAL_SERVER_ERROR_C.getErrorMessage())
+                            .build());
         }
     }
 
@@ -76,7 +85,9 @@ public class HARController {
             log.error("Exception in deleteHar method, har id is {}, error: {}", id, ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
-                    .body(new CustomException("Something went wrong"));
+                    .body(CustomException.builder()
+                            .message(INTERNAL_SERVER_ERROR_C.getErrorMessage())
+                            .build());
         }
     }
 
@@ -88,13 +99,17 @@ public class HARController {
         catch(JsonValidateFailedException ex) {
             return ResponseEntity
                     .status(BAD_REQUEST)
-                    .body(new CustomException(ex.getFailList().toString()));
+                    .body(CustomException.builder()
+                            .message(JSON_VALIDATE_FAILED_EXCEPTION.getErrorMessage() + ex.getFailList().toString())
+                            .build());
         }
         catch (Exception ex) {
             log.error("Exception in addHar method, file {} error: {}", file.getOriginalFilename(), ex);
             return ResponseEntity
                     .status(INTERNAL_SERVER_ERROR)
-                    .body(new CustomException("Something went wrong"));
+                    .body(CustomException.builder()
+                            .message(INTERNAL_SERVER_ERROR_C.getErrorMessage())
+                            .build());
         }
     }
 }

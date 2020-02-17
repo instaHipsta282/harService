@@ -4,14 +4,12 @@ import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.Request;
 import com.instahipsta.harCRUD.service.RequestService;
 import com.instahipsta.harCRUD.service.TestProfileService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@Slf4j
 public class RabbitMqListener {
 
     private TestProfileService testProfileService;

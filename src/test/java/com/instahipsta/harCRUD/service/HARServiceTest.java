@@ -167,7 +167,7 @@ public class HARServiceTest {
     @ParameterizedTest
     @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#jsonMappingExFileSource")
     void createDtoFromFileJsonMappingExTest(MultipartFile file) {
-        Assertions.assertThrows(JsonMappingException.class, () ->
+        Assertions.assertThrows(JsonValidateFailedException.class, () ->
                 harService.createDtoFromFile(file));
     }
 

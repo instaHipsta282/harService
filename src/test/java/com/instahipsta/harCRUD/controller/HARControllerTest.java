@@ -1,5 +1,7 @@
 package com.instahipsta.harCRUD.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instahipsta.harCRUD.model.dto.HAR.HARDto;
 import com.instahipsta.harCRUD.model.entity.HAR;
 import com.instahipsta.harCRUD.repository.HARRepo;
 import org.junit.jupiter.api.Assertions;
@@ -14,15 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,35 +43,32 @@ public class HARControllerTest {
     @MockBean
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void initMocks() {
         MockitoAnnotations.initMocks(this);
     }
 
     @ParameterizedTest
-    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#fileHarAndIdSource")
+    @MethodSource("com.instahipsta.harCRUD.arg.HARArgs#newFileHarAndIdSource")
     void updateTest(MultipartFile file, HAR har, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
         when(harRepo.save(any(HAR.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
-        boolean isContains = mockMvc.perform(put("/har/" + id)
+        byte[] content = mockMvc.perform(put("/har/" + id)
                 .content(file.getBytes())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200))
                 .andReturn()
-                .getResponse()
-                .getContentAsString()
-                .contains("{\"log\":" +
-                        "{\"version\":\"1.2\"," +
-                        "\"creator\":" +
-                        "{\"name\":\"Firefox\"," +
-                        "\"version\":\"70.0.1\"}," +
-                        "\"browser\":" +
-                        "{\"name\":\"Firefox\"," +
-                        "\"version\":\"70.0.1\"}," +
-                        "\"pages\":");
+                .getResponse().getContentAsByteArray();
 
-        Assertions.assertTrue(isContains);
+        HARDto dto = objectMapper.readValue(content, HARDto.class);
+
+        Assertions.assertEquals("1.15", dto.getLog().getVersion());
+        Assertions.assertEquals("Chrome", dto.getLog().getBrowser().getName());
+        Assertions.assertEquals(HttpMethod.DELETE, dto.getLog().getEntries().get(0).getRequest().getMethod());
     }
 
     @ParameterizedTest
@@ -107,22 +107,16 @@ public class HARControllerTest {
     void getTest(HAR har, long id) throws Exception {
         when(harRepo.findById(id)).thenReturn(Optional.of(har));
 
-        boolean isContains = mockMvc.perform(get("/har/" + id))
+        byte[] content = mockMvc.perform(get("/har/" + id))
                 .andExpect(status().is(200))
                 .andReturn()
-                .getResponse()
-                .getContentAsString()
-                .contains("{\"log\":" +
-                        "{\"version\":\"1.2\"," +
-                        "\"creator\":" +
-                        "{\"name\":\"Firefox\"," +
-                        "\"version\":\"70.0.1\"}," +
-                        "\"browser\":" +
-                        "{\"name\":\"Firefox\"," +
-                        "\"version\":\"70.0.1\"}," +
-                        "\"pages\":");
+                .getResponse().getContentAsByteArray();
 
-        Assertions.assertTrue(isContains);
+        HARDto dto = objectMapper.readValue(content, HARDto.class);
+
+        Assertions.assertEquals("1.2", dto.getLog().getVersion());
+        Assertions.assertEquals("Firefox", dto.getLog().getBrowser().getName());
+        Assertions.assertEquals(HttpMethod.GET, dto.getLog().getEntries().get(0).getRequest().getMethod());
     }
 
     @ParameterizedTest
@@ -158,22 +152,21 @@ public class HARControllerTest {
         when(harRepo.save(any()))
                 .thenAnswer(AdditionalAnswers.returnsFirstArg());
 
-        boolean isContains = mockMvc.perform(multipart("/har")
+        doNothing().when(rabbitTemplate).convertAndSend(any());
+
+        byte[] content = mockMvc.perform(multipart("/har")
                 .file(file)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().is(200))
                 .andReturn()
                 .getResponse()
-                .getContentAsString()
-                .contains("{\"log\":" +
-                        "{\"version\":\"1.2\"," +
-                        "\"creator\":" +
-                        "{\"name\":\"Firefox\"," +
-                        "\"version\":\"70.0.1\"}," +
-                        "\"browser\":" +
-                        "{\"name\":\"Firefox\"," +
-                        "\"version\":\"70.0.1\"}");
-        Assertions.assertTrue(isContains);
+                .getContentAsByteArray();
+
+        HARDto dto = objectMapper.readValue(content, HARDto.class);
+
+        Assertions.assertEquals("1.2", dto.getLog().getVersion());
+        Assertions.assertEquals("Firefox", dto.getLog().getBrowser().getName());
+        Assertions.assertEquals(HttpMethod.GET, dto.getLog().getEntries().get(0).getRequest().getMethod());
     }
 
     @ParameterizedTest
