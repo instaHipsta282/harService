@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,14 +22,14 @@ public class RequestDto {
     private String httpVersion;
     @NotNull
     @Valid
-    private Header[] headers;
-    private Cookie[] cookies;
+    private List<Header> headers;
+    private List<Cookie> cookies;
 
     @JsonAlias({"content", "body"})
     private Content content;
 
     @JsonAlias({"queryString", "params"})
-    private QueryString[] queryString;
+    private List<QueryString> queryString;
 
     private long headersSize;
 }

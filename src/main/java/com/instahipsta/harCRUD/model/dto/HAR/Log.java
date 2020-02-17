@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class Log {
@@ -15,8 +16,8 @@ public class Log {
     @NotNull
     @Valid
     private Browser browser;
-    private Page[] pages;
+    private List<Page> pages;
     @NotNull
     @Valid
-    private Entry[] entries;
+    private List<Entry> entries;
 }

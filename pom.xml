@@ -15,6 +15,7 @@
         <modelmapper.version>2.3.5</modelmapper.version>
         <jacoco.version>0.8.5</jacoco.version>
         <hibernate-types-52.version>2.9.3</hibernate-types-52.version>
+        <spring-boot-starter-parent-version>2.2.0.RELEASE</spring-boot-starter-parent-version>
     </properties>
 
     <parent>
@@ -94,6 +95,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-starter-parent-version}</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
