@@ -9,8 +9,8 @@ spring:
     hibernate:
       ddl-auto: none
   datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/har_service_test
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:10-alpine:///har_service_test
     password: test
     username: test
   servlet:
