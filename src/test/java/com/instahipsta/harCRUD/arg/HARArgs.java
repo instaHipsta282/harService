@@ -20,11 +20,10 @@ public class HARArgs {
                 1L));
     }
 
-    static Stream<Arguments> newFileHarAndIdSource() throws IOException {
+    static Stream<Arguments> newFileAndHarSource() throws IOException {
         return Stream.of(Arguments.of(
                 getMultipartFile("test_archive_upd.har"),
-                getHAR("test_archive.har"),
-                1L));
+                getHAR("test_archive.har")));
     }
 
     static Stream<Arguments> fileAndIdSource() throws IOException {
@@ -37,6 +36,12 @@ public class HARArgs {
         return Stream.of(Arguments.of(
                 getMultipartFile("test4.json"),
                 1L));
+    }
+
+    static Stream<Arguments> notValidFileAndHarSource() throws IOException {
+        return Stream.of(Arguments.of(
+                getMultipartFile("test4.json"),
+                getHAR("test_archive.har")));
     }
 
     static Stream<Arguments> fileSource() throws IOException {
